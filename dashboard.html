@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Office</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&display=swap');
+:root{--red:#CC0000;--pass:#057A55;--pass-bg:#ECFDF5;--pass-border:#6EE7B7;--fail-bg:#FFF5F5;--fail-border:#FFBABA;--warn:#D97706;--warn-bg:#FFFBEB;--bg:#F0F0F0;--card:#fff;--text:#1A1A1A;--muted:#6B7280;--border:#E5E7EB;--shadow:0 2px 12px rgba(0,0,0,.08);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:40px;}
+/* HEADER */
+.header{background:var(--red);color:#fff;padding:18px 20px 28px;display:flex;justify-content:space-between;align-items:flex-start;}
+.logo{font-size:22px;font-weight:800;letter-spacing:.06em;}
+.logo span{display:block;font-size:11px;font-weight:500;opacity:.65;}
+.header-right{text-align:right;}
+.live-dot{display:inline-block;width:8px;height:8px;background:#4ADE80;border-radius:50%;margin-right:5px;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+.live-text{font-size:12px;font-weight:600;opacity:.9;}
+.last-update{font-size:11px;opacity:.6;margin-top:3px;}
+/* SUMMARY CARDS */
+.summary-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:14px 14px 0;}
+.sum-card{background:var(--card);border-radius:12px;padding:14px 12px;box-shadow:var(--shadow);text-align:center;}
+.sum-num{font-size:28px;font-weight:800;line-height:1;}
+.sum-label{font-size:11px;color:var(--muted);margin-top:4px;font-weight:600;}
+.sum-done .sum-num{color:var(--pass);}
+.sum-issue .sum-num{color:var(--red);}
+.sum-wait .sum-num{color:var(--muted);}
+/* SHIFT FILTER */
+.filter-row{display:flex;gap:8px;margin:14px 14px 0;}
+.filter-btn{flex:1;padding:9px;border-radius:8px;border:1.5px solid var(--border);background:var(--card);font-family:'Sarabun',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;color:var(--muted);}
+.filter-btn.active{background:var(--red);border-color:var(--red);color:#fff;}
+/* STATION GRID */
+.section{margin:14px 14px 0;}
+.section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:8px;}
+.station-grid{display:flex;flex-direction:column;gap:8px;}
+.s-card{background:var(--card);border-radius:12px;border:1.5px solid var(--border);padding:13px 14px;box-shadow:var(--shadow);transition:border-color .2s;}
+.s-card.done{border-left:4px solid var(--pass);}
+.s-card.issue{border-left:4px solid var(--red);}
+.s-card.pending{border-left:4px solid #D1D5DB;}
+.s-top{display:flex;align-items:center;gap:10px;}
+.s-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.dot-done{background:var(--pass);} .dot-issue{background:var(--red);} .dot-pending{background:#D1D5DB;}
+.s-name{font-size:15px;font-weight:700;flex:1;}
+.s-chip{font-size:11px;font-weight:700;border-radius:99px;padding:3px 10px;}
+.chip-done{background:var(--pass-bg);color:var(--pass);}
+.chip-issue{background:var(--fail-bg);color:var(--red);}
+.chip-pending{background:#F3F4F6;color:var(--muted);}
+.s-detail{font-size:12px;color:var(--muted);margin-top:5px;padding-left:20px;}
+.s-fail-items{font-size:12px;color:var(--red);margin-top:4px;padding-left:20px;font-weight:500;}
+/* ISSUE ALERT */
+.alert-box{background:var(--fail-bg);border:1.5px solid var(--fail-border);border-radius:12px;padding:13px 14px;margin-bottom:10px;}
+.alert-title{font-size:13px;font-weight:700;color:var(--red);margin-bottom:4px;}
+.alert-body{font-size:12px;color:var(--text);}
+/* refresh */
+.refresh-bar{display:flex;align-items:center;justify-content:space-between;margin:14px 14px 0;}
+.refresh-btn{background:var(--card);border:1.5px solid var(--border);border-radius:8px;padding:7px 14px;font-family:'Sarabun',sans-serif;font-size:13px;font-weight:600;cursor:pointer;color:var(--text);}
+.refresh-btn:hover{background:#F3F4F6;}
+.auto-text{font-size:11px;color:var(--muted);}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="logo">ISUZU <span>FRG · Office Dashboard</span></div>
+    <div style="font-size:13px;opacity:.8;margin-top:8px;" id="headerDate">—</div>
+  </div>
+  <div class="header-right">
+    <div><span class="live-dot"></span><span class="live-text">LIVE</span></div>
+    <div class="last-update" id="lastUpdate">—</div>
+  </div>
+</div>
+
+<!-- SUMMARY -->
+<div class="summary-row">
+  <div class="sum-card sum-done"><div class="sum-num" id="sumDone">0</div><div class="sum-label">ตรวจแล้ว</div></div>
+  <div class="sum-card sum-issue"><div class="sum-num" id="sumIssue">0</div><div class="sum-label">พบปัญหา</div></div>
+  <div class="sum-card sum-wait"><div class="sum-num" id="sumWait">0</div><div class="sum-label">รอตรวจ</div></div>
+</div>
+
+<!-- FILTER -->
+<div class="filter-row">
+  <button class="filter-btn active" onclick="setShift('ALL',this)">ทั้งหมด</button>
+  <button class="filter-btn" onclick="setShift('A',this)">SHIFT A</button>
+  <button class="filter-btn" onclick="setShift('B',this)">SHIFT B</button>
+</div>
+
+<!-- ISSUES -->
+<div class="section" id="issueSection" style="display:none;">
+  <div class="section-title" style="color:var(--red);">⚠ แจ้งเตือนปัญหา</div>
+  <div id="issueList"></div>
+</div>
+
+<!-- REFRESH BAR -->
+<div class="refresh-bar">
+  <div class="auto-text" id="countdownText">รีเฟรชอัตโนมัติใน 30 วิ</div>
+  <button class="refresh-btn" onclick="refresh()">🔄 รีเฟรชเดี๋ยวนี้</button>
+</div>
+
+<!-- STATIONS -->
+<div class="section">
+  <div class="section-title">สถานะทุก Station</div>
+  <div class="station-grid" id="stationGrid"></div>
+</div>
+
+<script>
+// ============================================================
+// ALL STATIONS ที่มีในโรงงาน (ใส่เพิ่มได้ตามจริง)
+// ============================================================
+const ALL_STATIONS = [
+  "MA1-04","MA1-05","MA1-06","MA1-07","MA1-08",
+  "MA1-09","MA1-10","MA1-11","MA1-12","MA1-13",
+];
+
+let currentShift = "ALL";
+let countdown = 30;
+let countdownTimer;
+
+const today = new Date().toISOString().split("T")[0];
+document.getElementById("headerDate").textContent =
+  new Date().toLocaleDateString("th-TH",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+
+function setShift(s, btn){
+  currentShift=s;
+  document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  renderDashboard();
+}
+
+function getSubs(){
+  return JSON.parse(localStorage.getItem("isuzu_submissions")||"[]");
+}
+
+function refresh(){
+  renderDashboard();
+  resetCountdown();
+}
+
+function resetCountdown(){
+  countdown=30;
+  clearInterval(countdownTimer);
+  countdownTimer = setInterval(()=>{
+    countdown--;
+    document.getElementById("countdownText").textContent=`รีเฟรชอัตโนมัติใน ${countdown} วิ`;
+    if(countdown<=0){ refresh(); }
+  },1000);
+}
+
+function renderDashboard(){
+  const all = getSubs();
+  const todaySubs = all.filter(s=>s.date===today && s.status==="approved");
+  const filtered = currentShift==="ALL" ? todaySubs : todaySubs.filter(s=>s.shift===currentShift);
+
+  // update timestamp
+  document.getElementById("lastUpdate").textContent =
+    "อัปเดต "+new Date().toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+
+  // summary
+  const stations = currentShift==="ALL" ? ALL_STATIONS : ALL_STATIONS;
+  let doneCount=0, issueCount=0, waitCount=0;
+  const issueItems=[];
+
+  const grid = document.getElementById("stationGrid");
+  grid.innerHTML="";
+
+  stations.forEach(st=>{
+    const stSubs = filtered.filter(s=>s.stage===st);
+    const shiftFilter = currentShift==="ALL" ? ["A","B"] : [currentShift];
+
+    // check each shift
+    const results = shiftFilter.map(sh=>{
+      const sub = stSubs.find(s=>s.shift===sh);
+      if(!sub) return {shift:sh, status:"pending"};
+      const hasFail = sub.checks.some(c=>c.result==="fail");
+      return {shift:sh, status:hasFail?"issue":"done", sub};
+    });
+
+    // overall
+    const allPending = results.every(r=>r.status==="pending");
+    const anyIssue = results.some(r=>r.status==="issue");
+    const anyDone = results.some(r=>r.status!=="pending");
+
+    if(allPending) waitCount++;
+    else if(anyIssue) { issueCount++; doneCount++; }
+    else { doneCount++; }
+
+    const overallClass = allPending?"pending":anyIssue?"issue":"done";
+    const chipClass = allPending?"chip-pending":anyIssue?"chip-issue":"chip-done";
+    const chipText = allPending?"รอตรวจสอบ":anyIssue?"⚠ พบปัญหา":"✓ ผ่านแล้ว";
+    const dotClass = allPending?"dot-pending":anyIssue?"dot-issue":"dot-done";
+
+    // collect issues
+    if(anyIssue){
+      results.filter(r=>r.status==="issue").forEach(r=>{
+        const failNames = r.sub.checks.filter(c=>c.result==="fail").map(c=>c.name.replace(/\n/g," ")).join(", ");
+        issueItems.push({stage:st, shift:r.shift, worker:r.sub.worker, failNames, remark:r.sub.remark});
+      });
+    }
+
+    // detail rows
+    const detailRows = results.map(r=>{
+      if(r.status==="pending") return `<div class="s-detail">SHIFT ${r.shift}: รอตรวจสอบ</div>`;
+      const failC = r.sub.checks.filter(c=>c.result==="fail").length;
+      const passC = r.sub.checks.filter(c=>c.result==="pass").length;
+      const t = new Date(r.sub.timestamp_foreman||r.sub.timestamp_worker).toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"});
+      let html=`<div class="s-detail">SHIFT ${r.shift}: ผ่าน ${passC}/${r.sub.checks.length} · อนุมัติ ${t} (${r.sub.foreman||r.sub.worker})</div>`;
+      if(failC>0){
+        const fn=r.sub.checks.filter(c=>c.result==="fail").map(c=>c.name.replace(/\n/g," ")).join(", ");
+        html+=`<div class="s-fail-items">✗ ${fn}</div>`;
+      }
+      return html;
+    }).join("");
+
+    grid.innerHTML+=`
+      <div class="s-card ${overallClass}">
+        <div class="s-top">
+          <div class="s-dot ${dotClass}"></div>
+          <div class="s-name">Stage ${st}</div>
+          <span class="s-chip ${chipClass}">${chipText}</span>
+        </div>
+        ${detailRows}
+      </div>
+    `;
+  });
+
+  // summary numbers
+  document.getElementById("sumDone").textContent=doneCount;
+  document.getElementById("sumIssue").textContent=issueCount;
+  document.getElementById("sumWait").textContent=waitCount;
+
+  // issue alerts
+  const issueSection = document.getElementById("issueSection");
+  const issueList = document.getElementById("issueList");
+  if(issueItems.length){
+    issueSection.style.display="block";
+    issueList.innerHTML = issueItems.map(i=>`
+      <div class="alert-box">
+        <div class="alert-title">⚠ Stage ${i.stage} · SHIFT ${i.shift}</div>
+        <div class="alert-body">Worker: ${i.worker}<br>รายการ: ${i.failNames}${i.remark?`<br>หมายเหตุ: ${i.remark}`:""}</div>
+      </div>
+    `).join("");
+  } else {
+    issueSection.style.display="none";
+  }
+}
+
+renderDashboard();
+resetCountdown();
+</script>
+</body>
+</html>
