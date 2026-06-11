@@ -3,30 +3,41 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Worker — MA1-04</title>
+<title>Worker — ตรวจสอบ</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&display=swap');
 :root{--red:#CC0000;--red-dark:#A00000;--pass:#057A55;--pass-bg:#ECFDF5;--pass-border:#6EE7B7;--fail-bg:#FFF5F5;--fail-border:#FFBABA;--bg:#F5F5F5;--card:#fff;--text:#1A1A1A;--muted:#6B7280;--border:#E5E7EB;--shadow:0 2px 12px rgba(0,0,0,.08);}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px;}
-.header{background:var(--red);color:white;padding:20px 16px 32px;}
-.header-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
-.logo{font-size:20px;font-weight:800;letter-spacing:.06em;}
-.logo span{display:block;font-size:10px;font-weight:500;opacity:.6;letter-spacing:.05em;}
-.shift-pill{background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.4);border-radius:8px;padding:5px 13px;font-size:13px;font-weight:700;cursor:pointer;user-select:none;}
-.header-label{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;opacity:.65;margin-bottom:2px;}
-.header-name{font-size:24px;font-weight:800;}
+body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:60px;}
+.header{background:var(--red);color:#fff;padding:18px 16px 28px;}
+.header-top{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.back-btn{background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:8px;padding:6px 12px;font-family:'Sarabun',sans-serif;font-size:13px;font-weight:600;cursor:pointer;}
+.back-btn:hover{background:rgba(255,255,255,.3);}
+.logo{font-size:16px;font-weight:800;letter-spacing:.05em;}
+.header-title{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;opacity:.65;margin-bottom:2px;}
+.header-name{font-size:20px;font-weight:800;line-height:1.2;}
 .header-sub{font-size:13px;opacity:.75;margin-top:2px;}
-.meta-card{background:var(--card);margin:-12px 14px 0;border-radius:14px;box-shadow:var(--shadow);padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:12px;opacity:.75;margin-top:8px;flex-wrap:wrap;}
+.breadcrumb span{opacity:.6;}
+.section{margin:14px 14px 0;}
+.section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:8px;}
+.grid{display:flex;flex-direction:column;gap:8px;}
+.nav-card{background:var(--card);border-radius:12px;border:1.5px solid var(--border);padding:14px 16px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px;cursor:pointer;transition:transform .15s,box-shadow .15s;}
+.nav-card:active{transform:scale(.98);}
+.nav-icon{font-size:28px;flex-shrink:0;}
+.nav-info{flex:1;}
+.nav-title{font-size:15px;font-weight:700;}
+.nav-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+.nav-arrow{font-size:20px;color:var(--red);font-weight:700;}
+/* Check form */
+.meta-card{background:var(--card);margin:0 14px;border-radius:0 0 12px 12px;box-shadow:var(--shadow);padding:12px 14px;display:grid;grid-template-columns:1fr 1fr;gap:10px;border-top:1px solid var(--border);}
 .meta-item label{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:3px;}
-.meta-item input,.meta-item select{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-family:'Sarabun',sans-serif;font-size:14px;background:#F9FAFB;outline:none;transition:border-color .15s;}
+.meta-item input,.meta-item select{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;font-family:'Sarabun',sans-serif;font-size:14px;background:#F9FAFB;outline:none;transition:border-color .15s;}
 .meta-item input:focus,.meta-item select:focus{border-color:var(--red);background:#fff;}
 .progress-wrap{margin:14px 14px 0;}
 .progress-bg{background:#E5E7EB;border-radius:99px;height:5px;overflow:hidden;}
 .progress-fill{background:var(--red);height:100%;border-radius:99px;transition:width .3s;width:0%;}
 .progress-label{font-size:11px;color:var(--muted);text-align:right;margin-top:3px;}
-.section{margin:14px 14px 0;}
-.section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:8px;}
 .check-list{display:flex;flex-direction:column;gap:8px;}
 .check-item{background:var(--card);border-radius:12px;border:1.5px solid var(--border);padding:12px 14px;box-shadow:var(--shadow);transition:border-color .2s,background .2s;}
 .check-item.pass{border-color:var(--pass-border);background:var(--pass-bg);}
@@ -49,120 +60,317 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 .field-card input,.field-card textarea{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:9px 10px;font-family:'Sarabun',sans-serif;font-size:14px;outline:none;background:#F9FAFB;transition:border-color .15s;}
 .field-card input:focus,.field-card textarea:focus{border-color:var(--red);background:#fff;}
 .field-card textarea{resize:none;min-height:64px;}
-.submit-btn{width:calc(100% - 28px);margin:16px 14px 0;background:var(--red);color:#fff;border:none;border-radius:12px;padding:16px;font-family:'Sarabun',sans-serif;font-size:17px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s,transform .1s;}
+.submit-btn{width:calc(100% - 28px);margin:16px 14px 0;background:var(--red);color:#fff;border:none;border-radius:12px;padding:15px;font-family:'Sarabun',sans-serif;font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s;}
 .submit-btn:hover{background:var(--red-dark);}
-.submit-btn:active{transform:scale(.98);}
-.submit-btn:disabled{background:#9CA3AF;cursor:not-allowed;transform:none;}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#111827;color:#fff;border-radius:12px;padding:13px 20px;font-size:14px;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,.2);transition:transform .3s;z-index:999;text-align:center;min-width:260px;pointer-events:none;}
-.toast.show{transform:translateX(-50%) translateY(0);}
-.toast.ok{background:var(--pass);} .toast.err{background:var(--red);}
-/* success screen */
 .success-screen{display:none;padding:40px 20px;text-align:center;}
 .success-screen.show{display:block;}
 .success-icon{font-size:64px;margin-bottom:12px;}
 .success-title{font-size:22px;font-weight:700;margin-bottom:6px;}
 .success-sub{font-size:14px;color:var(--muted);margin-bottom:28px;}
 .success-info{background:#F9FAFB;border-radius:12px;padding:14px;text-align:left;font-size:14px;line-height:2;border:1.5px solid var(--border);margin-bottom:20px;}
-.reset-btn{width:100%;background:#F3F4F6;color:var(--text);border:none;border-radius:12px;padding:14px;font-family:'Sarabun',sans-serif;font-size:15px;font-weight:600;cursor:pointer;}
-.reset-btn:hover{background:#E5E7EB;}
+.reset-btn{width:100%;background:#F3F4F6;color:var(--text);border:none;border-radius:12px;padding:14px;font-family:'Sarabun',sans-serif;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:10px;}
+.home-btn{width:100%;background:var(--red);color:#fff;border:none;border-radius:12px;padding:14px;font-family:'Sarabun',sans-serif;font-size:15px;font-weight:600;cursor:pointer;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#111827;color:#fff;border-radius:12px;padding:13px 20px;font-size:14px;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,.2);transition:transform .3s;z-index:999;text-align:center;min-width:260px;pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast.ok{background:var(--pass);}.toast.err{background:var(--red);}
+.page{display:none;}.page.active{display:block;}
 </style>
 </head>
 <body>
 
-<div id="mainForm">
 <div class="header">
   <div class="header-top">
-    <div><div class="logo">ISUZU <span>FRG · FRP-F-02 REV.03</span></div></div>
-    <div class="shift-pill" id="shiftPill" onclick="toggleShift()">SHIFT A ▾</div>
+    <div class="logo">ISUZU FRG</div>
+    <button class="back-btn" id="backBtn" onclick="goBack()" style="display:none;">← ย้อนกลับ</button>
   </div>
-  <div class="header-label">ตรวจสอบด้วยตัวเอง — Worker</div>
-  <div class="header-name">Stage MA1-04</div>
-  <div class="header-sub" id="todayThai"></div>
+  <div class="header-title" id="headerLabel">เลือกแผนก</div>
+  <div class="header-name" id="headerName">Worker — ตรวจสอบ</div>
+  <div class="header-sub" id="headerSub">กรุณาเลือกแผนกของคุณ</div>
+  <div class="breadcrumb" id="breadcrumb"></div>
 </div>
 
-<div class="meta-card">
-  <div class="meta-item"><label>วันที่</label><input type="date" id="inputDate"></div>
-  <div class="meta-item">
-    <label>กะทำงาน</label>
-    <select id="inputShift" onchange="onShiftChange()">
-      <option value="A">SHIFT A</option>
-      <option value="B">SHIFT B</option>
-    </select>
+<!-- PAGE 1: เลือกแผนก -->
+<div class="page active" id="page-dept">
+  <div class="section">
+    <div class="section-title">เลือกแผนก</div>
+    <div class="grid" id="deptGrid"></div>
   </div>
 </div>
 
-<div class="progress-wrap">
-  <div class="progress-bg"><div class="progress-fill" id="pFill"></div></div>
-  <div class="progress-label" id="pLabel">ตรวจแล้ว 0 / 6 รายการ</div>
-</div>
-
-<div class="section">
-  <div class="section-title">หัวข้อตรวจสอบ</div>
-  <div class="check-list" id="checkList"></div>
-</div>
-
-<div class="section">
-  <div class="section-title">หมายเหตุ (ถ้ามี)</div>
-  <div class="field-card">
-    <label>บันทึกเพิ่มเติม</label>
-    <textarea id="remarkText" placeholder="สิ่งผิดปกติ, แจ้งซ่อม..."></textarea>
+<!-- PAGE 2: เลือก Group -->
+<div class="page" id="page-group">
+  <div class="section">
+    <div class="section-title">เลือก Group</div>
+    <div class="grid" id="groupGrid"></div>
   </div>
 </div>
 
-<div class="section">
-  <div class="section-title">ลงชื่อผู้ตรวจ</div>
-  <div class="field-card">
-    <label>ชื่อ-สกุล Worker</label>
-    <input type="text" id="workerName" placeholder="พิมพ์ชื่อ-สกุล...">
+<!-- PAGE 3: เลือก Stage -->
+<div class="page" id="page-stage">
+  <div class="section">
+    <div class="section-title">เลือก Stage</div>
+    <div class="grid" id="stageGrid"></div>
   </div>
 </div>
 
-<button class="submit-btn" id="submitBtn" onclick="submitWorker()">
-  ส่งให้ Foreman อนุมัติ →
-</button>
+<!-- PAGE 4: กรอกแบบฟอร์ม -->
+<div class="page" id="page-form">
+  <div class="meta-card">
+    <div class="meta-item"><label>วันที่</label><input type="date" id="inputDate"></div>
+    <div class="meta-item">
+      <label>กะทำงาน</label>
+      <select id="inputShift">
+        <option value="A">SHIFT A</option>
+        <option value="B">SHIFT B</option>
+      </select>
+    </div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-bg"><div class="progress-fill" id="pFill"></div></div>
+    <div class="progress-label" id="pLabel">ตรวจแล้ว 0 / 0 รายการ</div>
+  </div>
+  <div class="section">
+    <div class="section-title">หัวข้อตรวจสอบ</div>
+    <div class="check-list" id="checkList"></div>
+  </div>
+  <div class="section">
+    <div class="section-title">หมายเหตุ (ถ้ามี)</div>
+    <div class="field-card">
+      <label>บันทึกเพิ่มเติม</label>
+      <textarea id="remarkText" placeholder="สิ่งผิดปกติ, แจ้งซ่อม..."></textarea>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-title">ลงชื่อผู้ตรวจ</div>
+    <div class="field-card">
+      <label>ชื่อ-สกุล Worker</label>
+      <input type="text" id="workerName" placeholder="พิมพ์ชื่อ-สกุล...">
+    </div>
+  </div>
+  <button class="submit-btn" onclick="submitWorker()">ส่งให้ Foreman อนุมัติ →</button>
 </div>
 
-<!-- SUCCESS SCREEN -->
+<!-- SUCCESS -->
 <div class="success-screen" id="successScreen">
   <div class="success-icon">✅</div>
   <div class="success-title">ส่งสำเร็จแล้ว!</div>
   <div class="success-sub">รอ Foreman เข้ามาตรวจสอบและอนุมัติ</div>
   <div class="success-info" id="successInfo"></div>
-  <button class="reset-btn" onclick="resetForm()">+ ตรวจรอบถัดไป</button>
+  <button class="reset-btn" onclick="resetForm()">+ ตรวจรอบถัดไป (Stage เดิม)</button>
+  <button class="home-btn" onclick="goHome()">🏠 กลับหน้าหลัก</button>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-const STAGE="MA1-04", GROUP="FRF";
-const CHECKS=[
-  {id:1,name:"พื้นที่รอบบริเวณ JIG",method:"สายตา",standard:"ไม่มีสิ่งของที่ไม่จำเป็นวางอยู่"},
-  {id:2,name:"สภาพทั่วไปของ CLAMP",method:"สายตา, สัมผัส",standard:"ไม่หลวมคลอน"},
-  {id:3,name:"ไกด์-ประคองชิ้นส่วน",method:"สายตา, สัมผัส",standard:"ไม่โยก, ไม่หลวมคลอน"},
-  {id:4,name:"PIN, DATUM",method:"สายตา, สัมผัส",standard:"ไม่มี SPATTER ติด, ไม่หลวมหรือสึกหรอ"},
-  {id:5,name:"PROXIMITY / PHOTO SENSOR\nLIMIT SWITCH / POKAYOKE",method:"สายตา, สัมผัสเหล็กเช็ค Pokayoke",standard:"มีไฟติด, ไม่หลวมคลอน"},
-  {id:6,name:"สภาพสายดิน, กระบอกลม",method:"สายตา, ฟังเสียง",standard:"ไม่แตก, ไม่มีเสียงลมรั่ว"},
+const SHEETS_URL = "https://script.google.com/macros/s/AKfycbxFpwj3ZzsQK6CbbyiS-kyuiFPQd_3dNge_VE_7qgjxs5JsbaUN6eGjYkEXS7UfC6Mk/exec";
+
+// ============================================================
+// DATA
+// ============================================================
+const DEPARTMENTS = [
+  { id:"jig",     name:"Jig",            icon:"🔧" },
+  { id:"robot",   name:"Robot",          icon:"🤖" },
+  { id:"hoist",   name:"Hoist",          icon:"⚙️" },
+  { id:"air",     name:"Air Service Unit",icon:"💨" },
+  { id:"co2",     name:"ตู้เชื่อม CO2",  icon:"🔥" },
+  { id:"magnet",  name:"Hoist แม่เหล็ก", icon:"🧲" },
 ];
 
-let state={};
-function resetState(){CHECKS.forEach(c=>{state[c.id]={result:null,comment:""};});}
-resetState();
+const GROUPS = {
+  jig:    ["FRF","FRR","FRC","FRU","FRX","FXC"],
+  robot:  ["FRF","FRR","FRC","FRU","FRX","FXC"],
+  hoist:  ["FRF","FRR","FRU","FRX"],
+  air:    ["FRF","FRR","FRU","FRX"],
+  co2:    ["FRR"],
+  magnet: ["FRR"],
+};
 
-const today=new Date();
-document.getElementById("inputDate").value=today.toISOString().split("T")[0];
-document.getElementById("todayThai").textContent=today.toLocaleDateString("th-TH",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
-const initShift=(today.getHours()>=18||today.getHours()<6)?"B":"A";
-document.getElementById("inputShift").value=initShift;
-document.getElementById("shiftPill").textContent="SHIFT "+initShift+" ▾";
+const STAGES = {
+  jig: {
+    FRF:["SA1-01 4x4 LH","SA1-01 4x4 RH","SA1-01 4x2 LH","SA1-01 4x2 RH","SA1-02 LH","SA1-02 RH","MA1-00","MA1-02","MA1-03","MA1-04","MA1-05","MA1-06","MA1-07","MA1-08","MA1-09"],
+    FRR:["SC1-01 LH","SC1-01 RH","SC1-02 LH","SC1-02 RH","MC1-0.5","MC1-01","MC1-02","MC1-03","MC1-04","MC1-05","MC1-06","MC1-07","MC1-08","MC1-09","MC1-10"],
+    FRC:["CP1-02","CP1-03","CP1-04","CP1-05"],
+    FRU:["SA2-01 4x4 LH","SA2-01 4x4 RH","SA2-01 4x2 LH","SA2-01 4x2 RH","SA2-02 LH","SA2-02 RH","MA2-01","MA2-02","MA2-03","MA2-04","MA2-05","MA2-06","MA2-07","MA2-08","MA2-09"],
+    FRX:["SC2-01 RG LH","SC2-01 RG RH","SC2-02 LH","SC2-02 RH","MC2-01","MC2-02","MC2-03","MC2-04","MC2-05","MC2-06","MC2-07","MC2-08","MC2-09","MC2-10"],
+    FXC:["CP2-02","CP2-03","CP2-04","CP2-05"],
+  },
+  robot: {
+    FRF:["SA1-01-W1","SA1-01-W2","SA1-02-W1","SA1-02-W2","MA1-02-W1","MA1-02-W2","MA1-02-W3","MA1-02-W4","MA1-04-W1","MA1-04-W2","MA1-04-W3","MA1-04-W4","MA1-04-W5","MA1-04-W6","MA1-06-W1","MA1-06-W2","MA1-06-W3","MA1-06-W4"],
+    FRR:["SC1-01-W1","SC1-01-W2","SC1-01-W3","SC1-02-W1","SC1-02-W2","SC1-02-W3","MC1-02-W1","MC1-02-W2","MC1-02-W3","MC1-02-W4","MC1-04-W1","MC1-04-W2","MC1-04-W3","MC1-04-W4","MC1-05-W1","MC1-05-W2","MC1-05-W3","MC1-05-W4","MC1-07-W1","MC1-07-W2"],
+    FRC:["CP1-03-W1","CP1-03-W2","CP1-03-W3","CP1-03-W4","CP1-03-W5","CP1-03-W6"],
+    FRU:["SA2-01-W1","SA2-01-W2","SA2-02-W1","SA2-02-W2","MA2-02-W1","MA2-02-W2","MA2-02-W3","MA2-02-W4","MA2-04-W1","MA2-04-W2","MA2-04-W3","MA2-04-W4","MA2-04-W5","MA2-04-W6","MA2-06-W1","MA2-06-W2"],
+    FRX:["SC2-01-W1","SC2-01-W2","SC2-01-W3","SC2-02-W1","SC2-02-W2","SC2-02-W3","MC2-02-W1","MC2-02-W2","MC2-02-W3","MC2-02-W4","MC2-04-W1","MC2-04-W2","MC2-04-W3","MC2-04-W4","MC2-05-W1","MC2-05-W2"],
+    FXC:["CP2-03-W1","CP2-03-W2","CP2-03-W3","CP2-03-W4","CP2-03-W5","CP2-03-W6"],
+  },
+  hoist: {
+    FRF:["SA1-01","MA1-00"],
+    FRR:["SC1-01"],
+    FRU:["SA2-01","MA2-01"],
+    FRX:["SC2-01","MC2-01"],
+  },
+  air: {
+    FRF:["FRL-SA1-01","FRL-SA1-02","FRL-SA1-03","FRL-MA1-01"],
+    FRR:["FRL-SC1-01","FRL-SC1-02","FRL-SC1-03","FRL-MC1-01","FRL-MC1-02","FRL-MC1-03","FRL-MC1-04","FRL-MC1-05","FRL-MC1-06","FRL-MC1-07","FRL-MC1-08","FRL-MC1-09","FRL-MC1-10","FRL-MC1-11","FRL-MC1-12","FRL-MC1-13","FRL-MC1-14","FRL-MC1-15","FRL-MC1-16","FRL-MC1-17","FRL-MC1-18"],
+    FRU:["FRL-SA2-01","FRL-SA2-02","FRL-SA2-03","FRL-MC-01","FRL-MC-02","FRL-MC-03","FRL-MC-04","FRL-MC-05","FRL-MC-06","FRL-MC-07","FRL-MC-08","FRL-MC-09","FRL-MC-10","FRL-MC-11","FRL-MC-12","FRL-MC-13","FRL-MC-14","FRL-MC-15"],
+    FRX:["FRL-SC2-01","FRL-SC2-02","FRL-SC2-03","FRL-MC2-01","FRL-MC2-02","FRL-MC2-03","FRL-MC2-04","FRL-MC2-05","FRL-MC2-06","FRL-MC2-07","FRL-MC2-08","FRL-MC2-09","FRL-MC2-10","FRL-MC2-11","FRL-MC2-12","FRL-MC2-13","FRL-MC2-14","FRL-MC2-15"],
+  },
+  co2: {
+    FRR:["SC1-02","MC1-8.5 LH","MC1-8.5 RH","MC1-10 LH","MC1-10 RH"],
+  },
+  magnet: {
+    FRR:["MC1-0.5"],
+  },
+};
 
-function toggleShift(){const s=document.getElementById("inputShift");s.value=s.value==="A"?"B":"A";onShiftChange();}
-function onShiftChange(){document.getElementById("shiftPill").textContent="SHIFT "+document.getElementById("inputShift").value+" ▾";}
+// รายการตรวจเฉพาะ MA1-04 / FRF / Jig
+const SPECIAL_CHECKS = {
+  "jig_FRF_MA1-04": [
+    {id:1,name:"พื้นที่รอบบริเวณ JIG",        method:"สายตา",                              standard:"ไม่มีสิ่งของที่ไม่จำเป็นวางอยู่"},
+    {id:2,name:"สภาพทั่วไปของ CLAMP",          method:"สายตา, สัมผัส",                      standard:"ไม่หลวมคลอน"},
+    {id:3,name:"ไกด์-ประคองชิ้นส่วน",           method:"สายตา, สัมผัส",                      standard:"ไม่โยก, ไม่หลวมคลอน"},
+    {id:4,name:"PIN, DATUM",                    method:"สายตา, สัมผัส",                      standard:"ไม่มี SPATTER ติด, ไม่หลวมหรือสึกหรอ"},
+    {id:5,name:"PROXIMITY / PHOTO SENSOR\nLIMIT SWITCH / POKAYOKE",method:"สายตา, สัมผัสเหล็กเช็ค Pokayoke",standard:"มีไฟติด, ไม่หลวมคลอน"},
+    {id:6,name:"สภาพสายดิน, กระบอกลม",        method:"สายตา, ฟังเสียง",                    standard:"ไม่แตก, ไม่มีเสียงลมรั่ว"},
+  ]
+};
 
-function render(){
+// รายการพื้นฐานสำหรับทุก Stage ที่ยังไม่มีข้อมูล
+const DEFAULT_CHECKS = [
+  {id:1,name:"พื้นที่รอบๆ บริเวณ",  method:"สายตา", standard:"ไม่มีสิ่งของที่ไม่จำเป็นวางอยู่"},
+  {id:2,name:"สภาพทั่วไป",           method:"สายตา, สัมผัส", standard:"อยู่ในสภาพดี ไม่มีความผิดปกติ"},
+];
+
+// ============================================================
+// STATE
+// ============================================================
+let nav = { dept:null, group:null, stage:null };
+let checkState = {};
+let currentChecks = [];
+
+// INIT
+const today = new Date();
+document.getElementById("inputDate").value = today.toISOString().split("T")[0];
+const h = today.getHours();
+document.getElementById("inputShift").value = (h>=18||h<6)?"B":"A";
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function showPage(id){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById("page-"+id).classList.add("active");
+  document.getElementById("successScreen").style.display="none";
+  window.scrollTo(0,0);
+}
+
+function updateHeader(){
+  const d = nav.dept ? DEPARTMENTS.find(x=>x.id===nav.dept) : null;
+  const backBtn = document.getElementById("backBtn");
+  const bc = document.getElementById("breadcrumb");
+
+  if(!nav.dept){
+    document.getElementById("headerLabel").textContent="Worker — ตรวจสอบ";
+    document.getElementById("headerName").textContent="เลือกแผนก";
+    document.getElementById("headerSub").textContent="กรุณาเลือกแผนกของคุณ";
+    backBtn.style.display="none";
+    bc.innerHTML="";
+  } else if(!nav.group){
+    document.getElementById("headerLabel").textContent=d.icon+" "+d.name;
+    document.getElementById("headerName").textContent="เลือก Group";
+    document.getElementById("headerSub").textContent="กรุณาเลือก Group ของคุณ";
+    backBtn.style.display="block";
+    bc.innerHTML=`<span>${d.name}</span>`;
+  } else if(!nav.stage){
+    document.getElementById("headerLabel").textContent=d.icon+" "+d.name+" · "+nav.group;
+    document.getElementById("headerName").textContent="เลือก Stage";
+    document.getElementById("headerSub").textContent="กรุณาเลือก Stage ของคุณ";
+    backBtn.style.display="block";
+    bc.innerHTML=`<span>${d.name}</span> › <span>${nav.group}</span>`;
+  } else {
+    document.getElementById("headerLabel").textContent=d.icon+" "+d.name+" · "+nav.group;
+    document.getElementById("headerName").textContent=nav.stage;
+    document.getElementById("headerSub").textContent=today.toLocaleDateString("th-TH",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+    backBtn.style.display="block";
+    bc.innerHTML=`<span>${d.name}</span> › <span>${nav.group}</span> › <span>${nav.stage}</span>`;
+  }
+}
+
+function goBack(){
+  if(nav.stage){ nav.stage=null; updateHeader(); renderStages(); showPage("stage"); }
+  else if(nav.group){ nav.group=null; updateHeader(); renderGroups(); showPage("group"); }
+  else if(nav.dept){ nav.dept=null; updateHeader(); renderDepts(); showPage("dept"); }
+}
+
+function goHome(){
+  nav={dept:null,group:null,stage:null};
+  document.getElementById("workerName").value="";
+  document.getElementById("remarkText").value="";
+  document.getElementById("successScreen").style.display="none";
+  updateHeader();
+  renderDepts();
+  showPage("dept");
+}
+
+// ============================================================
+// RENDER NAVIGATION
+// ============================================================
+function renderDepts(){
+  const grid = document.getElementById("deptGrid");
+  grid.innerHTML="";
+  DEPARTMENTS.forEach(d=>{
+    const el=document.createElement("div");
+    el.className="nav-card";
+    el.innerHTML=`<div class="nav-icon">${d.icon}</div><div class="nav-info"><div class="nav-title">${d.name}</div><div class="nav-sub">${GROUPS[d.id].join(", ")}</div></div><div class="nav-arrow">›</div>`;
+    el.onclick=()=>{ nav.dept=d.id; updateHeader(); renderGroups(); showPage("group"); };
+    grid.appendChild(el);
+  });
+}
+
+function renderGroups(){
+  const grid=document.getElementById("groupGrid");
+  grid.innerHTML="";
+  GROUPS[nav.dept].forEach(g=>{
+    const stages=STAGES[nav.dept][g]||[];
+    const el=document.createElement("div");
+    el.className="nav-card";
+    el.innerHTML=`<div class="nav-icon">🏭</div><div class="nav-info"><div class="nav-title">${g}</div><div class="nav-sub">${stages.length} Station</div></div><div class="nav-arrow">›</div>`;
+    el.onclick=()=>{ nav.group=g; updateHeader(); renderStages(); showPage("stage"); };
+    grid.appendChild(el);
+  });
+}
+
+function renderStages(){
+  const grid=document.getElementById("stageGrid");
+  grid.innerHTML="";
+  const stages=STAGES[nav.dept][nav.group]||[];
+  stages.forEach(s=>{
+    const el=document.createElement("div");
+    el.className="nav-card";
+    const key=`${nav.dept}_${nav.group}_${s}`;
+    const isSpecial=!!SPECIAL_CHECKS[key];
+    el.innerHTML=`<div class="nav-icon">📍</div><div class="nav-info"><div class="nav-title">${s}</div><div class="nav-sub">${isSpecial?"รายการตรวจเฉพาะ":"รายการพื้นฐาน"}</div></div><div class="nav-arrow">›</div>`;
+    el.onclick=()=>{ nav.stage=s; updateHeader(); initForm(); showPage("form"); };
+    grid.appendChild(el);
+  });
+}
+
+// ============================================================
+// FORM
+// ============================================================
+function initForm(){
+  const key=`${nav.dept}_${nav.group}_${nav.stage}`;
+  currentChecks = SPECIAL_CHECKS[key] || DEFAULT_CHECKS;
+  checkState={};
+  currentChecks.forEach(c=>{ checkState[c.id]={result:null,comment:""}; });
+  renderChecks();
+}
+
+function renderChecks(){
   const list=document.getElementById("checkList");
   list.innerHTML="";
-  CHECKS.forEach(c=>{
-    const s=state[c.id];
+  currentChecks.forEach(c=>{
+    const s=checkState[c.id];
     const div=document.createElement("div");
     div.className="check-item"+(s.result==="pass"?" pass":s.result==="fail"?" fail":"");
     div.innerHTML=`
@@ -182,56 +390,82 @@ function render(){
     `;
     list.appendChild(div);
   });
-  const done=Object.values(state).filter(s=>s.result!==null).length;
-  document.getElementById("pFill").style.width=(done/CHECKS.length*100)+"%";
-  document.getElementById("pLabel").textContent=`ตรวจแล้ว ${done} / ${CHECKS.length} รายการ`;
+  updateProgress();
 }
-function setR(id,v){state[id].result=state[id].result===v?null:v;if(state[id].result!=="fail")state[id].comment="";render();}
-function setC(id,v){state[id].comment=v;}
 
+function setR(id,v){checkState[id].result=checkState[id].result===v?null:v;if(checkState[id].result!=="fail")checkState[id].comment="";renderChecks();}
+function setC(id,v){checkState[id].comment=v;}
+
+function updateProgress(){
+  const total=currentChecks.length;
+  const done=Object.values(checkState).filter(s=>s.result!==null).length;
+  document.getElementById("pFill").style.width=(done/total*100)+"%";
+  document.getElementById("pLabel").textContent=`ตรวจแล้ว ${done} / ${total} รายการ`;
+}
+
+// ============================================================
+// SUBMIT
+// ============================================================
 function submitWorker(){
   const worker=document.getElementById("workerName").value.trim();
   const date=document.getElementById("inputDate").value;
   const shift=document.getElementById("inputShift").value;
-  const undone=CHECKS.filter(c=>state[c.id].result===null);
+  const undone=currentChecks.filter(c=>checkState[c.id].result===null);
   if(undone.length){showToast("ยังตรวจไม่ครบ "+undone.length+" รายการ","err");return;}
   if(!worker){showToast("กรุณาใส่ชื่อ Worker","err");return;}
 
+  const d=DEPARTMENTS.find(x=>x.id===nav.dept);
   const entry={
     id:"W"+Date.now(),
     timestamp_worker:new Date().toISOString(),
     timestamp_foreman:null,
-    date,shift,stage:STAGE,group:GROUP,worker,foreman:null,
+    date,shift,
+    dept:nav.dept, dept_name:d?d.name:"",
+    stage:nav.stage, group:nav.group,
+    worker, foreman:null,
     remark:document.getElementById("remarkText").value.trim(),
-    checks:CHECKS.map(c=>({id:c.id,name:c.name,result:state[c.id].result,comment:state[c.id].comment})),
+    checks:currentChecks.map(c=>({id:c.id,name:c.name,result:checkState[c.id].result,comment:checkState[c.id].comment})),
     status:"pending"
   };
 
-  // save to localStorage (shared DB)
+  // บันทึก localStorage
   const all=JSON.parse(localStorage.getItem("isuzu_submissions")||"[]");
   all.push(entry);
   localStorage.setItem("isuzu_submissions",JSON.stringify(all));
 
-  // show success
+  // ส่งไป Google Sheets
+  try{
+    const form=document.createElement("form");
+    form.method="POST"; form.action=SHEETS_URL; form.target="h_ifr"; form.style.display="none";
+    const inp=document.createElement("input"); inp.type="hidden"; inp.name="payload"; inp.value=JSON.stringify(entry);
+    form.appendChild(inp);
+    const ifr=document.createElement("iframe"); ifr.name="h_ifr"; ifr.style.display="none";
+    document.body.appendChild(ifr); document.body.appendChild(form); form.submit();
+    setTimeout(()=>{try{document.body.removeChild(form);document.body.removeChild(ifr);}catch(e){}},3000);
+  }catch(e){console.log("Sheets error:",e);}
+
+  // แสดง success
   const failC=entry.checks.filter(c=>c.result==="fail").length;
   document.getElementById("successInfo").innerHTML=`
-    <b>Stage:</b> ${STAGE} &nbsp;|&nbsp; <b>Group:</b> ${GROUP}<br>
+    <b>แผนก:</b> ${d?d.name:""}<br>
+    <b>Group:</b> ${nav.group} &nbsp;|&nbsp; <b>Stage:</b> ${nav.stage}<br>
     <b>วันที่:</b> ${date} &nbsp;|&nbsp; <b>กะ:</b> SHIFT ${shift}<br>
     <b>Worker:</b> ${worker}<br>
-    <b>ผล:</b> ผ่าน ${CHECKS.length-failC}/${CHECKS.length} รายการ
+    <b>ผล:</b> ผ่าน ${currentChecks.length-failC}/${currentChecks.length} รายการ
     ${failC?`<br><span style="color:var(--red);font-weight:600;">⚠ ไม่ผ่าน ${failC} รายการ</span>`:""}
   `;
-  document.getElementById("mainForm").style.display="none";
-  document.getElementById("successScreen").classList.add("show");
+  document.getElementById("page-form").style.display="none";
+  document.getElementById("successScreen").style.display="block";
+  window.scrollTo(0,0);
 }
 
 function resetForm(){
-  resetState();
   document.getElementById("workerName").value="";
   document.getElementById("remarkText").value="";
-  document.getElementById("mainForm").style.display="";
-  document.getElementById("successScreen").classList.remove("show");
-  render();
+  document.getElementById("successScreen").style.display="none";
+  document.getElementById("page-form").style.display="none";
+  initForm();
+  showPage("form");
 }
 
 function showToast(msg,type=""){
@@ -239,7 +473,10 @@ function showToast(msg,type=""){
   t.textContent=msg;t.className="toast show "+type;
   setTimeout(()=>t.className="toast",3000);
 }
-render();
+
+// START
+updateHeader();
+renderDepts();
 </script>
 </body>
 </html>
