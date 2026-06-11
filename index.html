@@ -8,55 +8,57 @@
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Sarabun',sans-serif;background:#F0F0F0;min-height:100vh;display:flex;flex-direction:column;}
-.header{background:#CC0000;color:white;padding:28px 20px 36px;}
-.logo{font-size:26px;font-weight:800;letter-spacing:.06em;}
-.logo span{display:block;font-size:12px;font-weight:500;opacity:.65;margin-top:2px;}
-.subtitle{font-size:14px;opacity:.8;margin-top:8px;}
-.cards{padding:20px 16px;display:flex;flex-direction:column;gap:14px;margin-top:-16px;}
-.card{background:white;border-radius:16px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.08);text-decoration:none;color:#1A1A1A;display:flex;align-items:center;gap:16px;border:1.5px solid #E5E7EB;transition:transform .15s,box-shadow .15s;}
-.card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.12);}
-.card-icon{font-size:36px;flex-shrink:0;}
+.header{background:#CC0000;color:white;padding:28px 20px 40px;}
+.logo{font-size:28px;font-weight:800;letter-spacing:.06em;}
+.logo span{display:block;font-size:12px;font-weight:500;opacity:.65;margin-top:2px;letter-spacing:.05em;}
+.subtitle{font-size:14px;opacity:.8;margin-top:6px;}
+.cards{padding:20px 16px;display:flex;flex-direction:column;gap:14px;margin-top:-20px;}
+.card{background:white;border-radius:16px;padding:20px 18px;box-shadow:0 2px 12px rgba(0,0,0,.08);text-decoration:none;color:#1A1A1A;display:flex;align-items:center;gap:16px;border:1.5px solid #E5E7EB;transition:transform .15s,box-shadow .15s;}
+.card:active{transform:scale(.98);}
+.card-icon{font-size:38px;flex-shrink:0;}
 .card-title{font-size:18px;font-weight:700;margin-bottom:3px;}
-.card-desc{font-size:13px;color:#6B7280;line-height:1.4;}
-.card-arrow{margin-left:auto;font-size:20px;color:#CC0000;flex-shrink:0;}
-.card.worker{border-left:4px solid #CC0000;}
-.card.foreman{border-left:4px solid #D97706;}
-.card.dashboard{border-left:4px solid #057A55;}
-.footer{text-align:center;padding:20px;font-size:12px;color:#9CA3AF;}
+.card-desc{font-size:13px;color:#6B7280;line-height:1.5;}
+.card-arrow{margin-left:auto;font-size:22px;color:#CC0000;flex-shrink:0;font-weight:700;}
+.card.worker{border-left:5px solid #CC0000;}
+.card.foreman{border-left:5px solid #D97706;}
+.card.dashboard{border-left:5px solid #057A55;}
+.footer{text-align:center;padding:24px;font-size:12px;color:#9CA3AF;margin-top:auto;}
 </style>
 </head>
 <body>
 
 <div class="header">
-  <div class="logo">ISUZU FRG <span>ระบบตรวจสอบ JIG ด้วยตัวเอง</span></div>
-  <div class="subtitle">FRP-F-02 REV.03 · Group FRF</div>
+  <div class="logo">ISUZU FRG
+    <span>ระบบตรวจสอบ JIG ด้วยตัวเอง · FRP-F-02 REV.03</span>
+  </div>
+  <div class="subtitle">Group FRF · กรุณาเลือกหน้าที่ต้องการ</div>
 </div>
 
 <div class="cards">
 
-  <a class="card worker" href="worker_MA104.html">
+  <a class="card worker" href="worker_MA104_final.html">
     <div class="card-icon">👷</div>
     <div>
       <div class="card-title">Worker — ตรวจสอบ</div>
-      <div class="card-desc">Stage MA1-04 · กรอกผลการตรวจสอบประจำวัน</div>
+      <div class="card-desc">Stage MA1-04<br>กรอกผลการตรวจสอบประจำวัน</div>
     </div>
     <div class="card-arrow">›</div>
   </a>
 
-  <a class="card foreman" href="foreman.html">
+  <a class="card foreman" href="foreman_final.html">
     <div class="card-icon">📋</div>
     <div>
       <div class="card-title">Foreman — อนุมัติ</div>
-      <div class="card-desc">ใส่รหัสพนักงาน · ตรวจสอบและอนุมัติรายการ</div>
+      <div class="card-desc">ใส่รหัสพนักงาน<br>ตรวจสอบและอนุมัติรายการ</div>
     </div>
     <div class="card-arrow">›</div>
   </a>
 
-  <a class="card dashboard" href="dashboard.html">
+  <a class="card dashboard" href="dashboard_final.html">
     <div class="card-icon">📊</div>
     <div>
       <div class="card-title">Dashboard — Office</div>
-      <div class="card-desc">ดูสถานะทุก Station แบบ Real-time</div>
+      <div class="card-desc">ดูสถานะทุก Station<br>แบบ Real-time</div>
     </div>
     <div class="card-arrow">›</div>
   </a>
