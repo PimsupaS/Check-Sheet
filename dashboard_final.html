@@ -86,6 +86,25 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
   <button class="filter-btn" onclick="setShift('B',this)">SHIFT B</button>
 </div>
 
+<!-- DATE FILTER -->
+<div class="filter-row" style="margin-top:8px;">
+  <button class="filter-btn active" id="dateBtn-today" onclick="setDateMode('today',this)">วันนี้</button>
+  <button class="filter-btn" id="dateBtn-week" onclick="setDateMode('week',this)">สัปดาห์นี้</button>
+  <button class="filter-btn" id="dateBtn-month" onclick="setDateMode('month',this)">เดือนนี้</button>
+  <button class="filter-btn" id="dateBtn-custom" onclick="setDateMode('custom',this)">กำหนดเอง</button>
+</div>
+<div id="customDateRow" style="display:none;margin:8px 14px 0;display:none;gap:8px;align-items:center;">
+  <input type="date" id="dateFrom" onchange="renderDashboard()" style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-family:'Sarabun',sans-serif;font-size:13px;outline:none;">
+  <span style="color:var(--muted);font-size:13px;">ถึง</span>
+  <input type="date" id="dateTo" onchange="renderDashboard()" style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-family:'Sarabun',sans-serif;font-size:13px;outline:none;">
+</div>
+
+<!-- EXPORT -->
+<div style="margin:8px 14px 0;display:flex;gap:8px;">
+  <button onclick="exportExcel()" style="flex:1;background:#057A55;color:white;border:none;border-radius:8px;padding:10px;font-family:'Sarabun',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">📥 Export Excel</button>
+  <button onclick="exportPrint()" style="flex:1;background:#1A56DB;color:white;border:none;border-radius:8px;padding:10px;font-family:'Sarabun',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">🖨 พิมพ์รายงาน</button>
+</div>
+
 <!-- ISSUES -->
 <div class="section" id="issueSection" style="display:none;">
   <div class="section-title" style="color:var(--red);">⚠ แจ้งเตือนปัญหา</div>
@@ -114,12 +133,56 @@ const ALL_STATIONS = [
 ];
 
 let currentShift = "ALL";
+let dateMode = "today";
+let dateFrom = "";
+let dateTo = "";
+
+function setDateMode(mode, btn){
+  dateMode = mode;
+  document.querySelectorAll("[id^='dateBtn-']").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  const customRow = document.getElementById("customDateRow");
+  if(mode === "custom"){
+    customRow.style.display = "flex";
+    const t = new Date().toISOString().split("T")[0];
+    document.getElementById("dateFrom").value = t;
+    document.getElementById("dateTo").value = t;
+  } else {
+    customRow.style.display = "none";
+  }
+  renderDashboard();
+}
+
+function getDateRange(){
+  const now = new Date();
+  const todayStr = now.toISOString().split("T")[0];
+  if(dateMode === "today") return { from: todayStr, to: todayStr };
+  if(dateMode === "week"){
+    const day = now.getDay();
+    const mon = new Date(now); mon.setDate(now.getDate() - (day===0?6:day-1));
+    const sun = new Date(mon); sun.setDate(mon.getDate()+6);
+    return { from: mon.toISOString().split("T")[0], to: sun.toISOString().split("T")[0] };
+  }
+  if(dateMode === "month"){
+    const from = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-01`;
+    const lastDay = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+    const to = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(lastDay).padStart(2,"0")}`;
+    return { from, to };
+  }
+  if(dateMode === "custom"){
+    return {
+      from: document.getElementById("dateFrom")?.value || todayStr,
+      to: document.getElementById("dateTo")?.value || todayStr
+    };
+  }
+  return { from: todayStr, to: todayStr };
+}
 let countdown = 30;
 let countdownTimer;
 
-const today = new Date().toISOString().split("T")[0];
 document.getElementById("headerDate").textContent =
   new Date().toLocaleDateString("th-TH",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+const todayISO = new Date().toISOString().split("T")[0];
 
 function setShift(s, btn){
   currentShift=s;
@@ -179,7 +242,11 @@ async function fetchFromSheets(){
 
 function renderDashboard(){
   const all = getSubs();
-  const todaySubs = all.filter(s=>s.date===today && s.status==="approved");
+  const range = getDateRange();
+  const todaySubs = all.filter(s=>{
+    const d = typeof s.date === "string" ? s.date.split("T")[0] : String(s.date).split("T")[0];
+    return d >= range.from && d <= range.to && s.status === "approved";
+  });
   const filtered = currentShift==="ALL" ? todaySubs : todaySubs.filter(s=>s.shift===currentShift);
 
   // update timestamp
@@ -277,6 +344,119 @@ function renderDashboard(){
 
 fetchFromSheets().then(()=>renderDashboard());
 resetCountdown();
+
+// ============================================================
+// EXPORT FUNCTIONS
+// ============================================================
+function getFilteredSubs(){
+  const all = getSubs();
+  const range = getDateRange();
+  const filtered = all.filter(s=>{
+    const d = typeof s.date==="string" ? s.date.split("T")[0] : String(s.date).split("T")[0];
+    const shiftOk = currentShift==="ALL" || s.shift===currentShift;
+    return d>=range.from && d<=range.to && s.status==="approved" && shiftOk;
+  });
+  return filtered;
+}
+
+function exportExcel(){
+  const subs = getFilteredSubs();
+  if(!subs.length){ alert("ไม่มีข้อมูลในช่วงเวลาที่เลือก"); return; }
+
+  const range = getDateRange();
+  let csv = "\uFEFF"; // BOM for Thai
+  csv += "วันที่,กะ,แผนก,Group,Stage,Worker,Foreman,เวลาส่ง,เวลาอนุมัติ,ผ่าน,ไม่ผ่าน,รายการไม่ผ่าน,หมายเหตุ\n";
+
+  subs.forEach(s=>{
+    const checks = s.checks||[];
+    const passC = checks.filter(c=>c.result==="pass").length;
+    const failC = checks.filter(c=>c.result==="fail").length;
+    const failNames = checks.filter(c=>c.result==="fail").map(c=>c.name.replace(/\n/g," ")).join("; ");
+    const tw = s.timestamp_worker ? new Date(s.timestamp_worker).toLocaleString("th-TH") : "";
+    const tf = s.timestamp_foreman ? new Date(s.timestamp_foreman).toLocaleString("th-TH") : "";
+    const row = [
+      s.date||"", s.shift||"", s.dept_name||"", s.group||"", s.stage||"",
+      s.worker||"", s.foreman||"", tw, tf,
+      passC, failC,
+      `"${failNames}"`,
+      `"${(s.remark||"").replace(/"/g,"'")}"`
+    ];
+    csv += row.join(",") + "\n";
+  });
+
+  const blob = new Blob([csv], {type:"text/csv;charset=utf-8;"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `ISUZU_JIG_Report_${range.from}_to_${range.to}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function exportPrint(){
+  const subs = getFilteredSubs();
+  if(!subs.length){ alert("ไม่มีข้อมูลในช่วงเวลาที่เลือก"); return; }
+  const range = getDateRange();
+
+  // Group by dept → group → stage
+  const grouped = {};
+  subs.forEach(s=>{
+    const dept = s.dept_name || "อื่นๆ";
+    const grp = s.group || "-";
+    const key = dept+"_"+grp;
+    if(!grouped[key]) grouped[key] = { dept, group:grp, stages:{} };
+    if(!grouped[key].stages[s.stage]) grouped[key].stages[s.stage] = [];
+    grouped[key].stages[s.stage].push(s);
+  });
+
+  let html = `
+    <html><head><meta charset="UTF-8">
+    <style>
+      body{font-family:sans-serif;font-size:12px;margin:20px;}
+      h1{font-size:16px;color:#CC0000;margin-bottom:4px;}
+      h2{font-size:13px;background:#CC0000;color:white;padding:4px 8px;margin:16px 0 4px;}
+      table{width:100%;border-collapse:collapse;margin-bottom:12px;}
+      th{background:#CC0000;color:white;padding:5px 8px;font-size:11px;text-align:left;}
+      td{border:1px solid #ddd;padding:4px 8px;font-size:11px;}
+      tr:nth-child(even){background:#f9f9f9;}
+      .pass{color:#057A55;font-weight:700;}
+      .fail{color:#CC0000;font-weight:700;}
+      @media print{body{margin:10px;}}
+    </style></head><body>
+    <h1>ISUZU FRG — รายงานตรวจสอบ JIG</h1>
+    <p>ช่วงวันที่: ${range.from} ถึง ${range.to} | SHIFT: ${currentShift}</p>
+  `;
+
+  Object.values(grouped).forEach(g=>{
+    html += `<h2>${g.dept} — ${g.group}</h2>`;
+    html += `<table><tr><th>Stage</th><th>วันที่</th><th>กะ</th><th>Worker</th><th>Foreman</th><th>ผล</th><th>รายการไม่ผ่าน</th><th>หมายเหตุ</th></tr>`;
+    Object.entries(g.stages).forEach(([stage, entries])=>{
+      entries.forEach(s=>{
+        const checks = s.checks||[];
+        const failC = checks.filter(c=>c.result==="fail").length;
+        const failNames = checks.filter(c=>c.result==="fail").map(c=>c.name.replace(/\n/g," ")).join(", ");
+        html += `<tr>
+          <td>${stage}</td>
+          <td>${s.date||""}</td>
+          <td>${s.shift||""}</td>
+          <td>${s.worker||""}</td>
+          <td>${s.foreman||""}</td>
+          <td class="${failC?"fail":"pass"}">${failC?"❌ ไม่ผ่าน "+failC+" รายการ":"✅ ผ่าน"}</td>
+          <td>${failNames}</td>
+          <td>${s.remark||""}</td>
+        </tr>`;
+      });
+    });
+    html += `</table>`;
+  });
+
+  html += `</body></html>`;
+  const w = window.open("","_blank");
+  w.document.write(html);
+  w.document.close();
+  setTimeout(()=>w.print(), 500);
+}
+
 </script>
 </body>
 </html>
