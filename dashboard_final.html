@@ -128,7 +128,7 @@ function setShift(s, btn){
   renderDashboard();
 }
 
-const SHEETS_URL = "https://script.google.com/macros/s/AKfycbx42brqNk3Tf5K2D_MM0YdDHMeu31sZ_KIwrjzwpRaHxqq5sC1Pcy5EZrgkGu9pjfPxpw/exec";
+const SHEETS_URL = "https://script.google.com/macros/s/AKfycbxFpwj3ZzsQK6CbbyiS-kyuiFPQd_3dNge_VE_7qgjxs5JsbaUN6eGjYkEXS7UfC6Mk/exec";
 
 function getSubs(){
   return JSON.parse(localStorage.getItem("isuzu_submissions")||"[]");
@@ -158,15 +158,20 @@ async function fetchFromSheets(){
       const local = JSON.parse(localStorage.getItem("isuzu_submissions")||"[]");
       const sheetsIds = data.rows.map(r=>r["ID"]);
       // rebuild from sheets rows
-      const fromSheets = data.rows.map(row=>({
-        id: row["ID"], date: row["วันที่"]||"", shift: row["กะ"]||"",
-        stage: row["Stage"]||"", group: row["Group"]||"",
-        worker: row["Worker"]||"", foreman: row["Foreman"]||"",
-        timestamp_worker: row["เวลา Worker"]||"",
-        timestamp_foreman: row["เวลา Foreman"]||"",
-        remark: row["หมายเหตุ"]||"", status:"approved",
-        checks: (() => { try { const j=JSON.parse(row["JSON เต็ม"]||"{}"); return j.checks||[]; } catch(e){return[];} })()
-      }));
+      const fromSheets = data.rows.map(row=>{
+        try{
+          const json = JSON.parse(row["JSON เต็ม"]||"{}");
+          return {...json, status: row["สถานะ"]||json.status||"approved"};
+        }catch(e){
+          return {
+            id: row["ID"]||"", date: String(row["วันที่"]||"").split("T")[0]||"",
+            shift: row["กะ"]||"", stage: row["Stage"]||"", group: row["Group"]||"",
+            dept_name: row["แผนก"]||"", worker: row["Worker"]||"", foreman: row["Foreman"]||"",
+            timestamp_worker: row["เวลา Worker"]||"", timestamp_foreman: row["เวลา Foreman"]||"",
+            remark: row["หมายเหตุ"]||"", status: row["สถานะ"]||"approved", checks:[]
+          };
+        }
+      });
       localStorage.setItem("isuzu_submissions", JSON.stringify(fromSheets));
     }
   } catch(e){ console.log("Sheets fetch error:",e); }

@@ -179,15 +179,35 @@ function switchTab(t){
   document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
   document.getElementById("page-"+t).classList.add("active");
   document.getElementById("tab-"+t).classList.add("active");
-  if(t==="stations") renderStations();
+  if(t==="stations") syncFromSheets().then(()=>renderStations());
   if(t==="approve") renderApprove();
 }
+
+const SHEETS_URL = "https://script.google.com/macros/s/AKfycbxFpwj3ZzsQK6CbbyiS-kyuiFPQd_3dNge_VE_7qgjxs5JsbaUN6eGjYkEXS7UfC6Mk/exec";
 
 function getSubs(){
   return JSON.parse(localStorage.getItem("isuzu_submissions")||"[]");
 }
 function saveSubs(arr){
   localStorage.setItem("isuzu_submissions",JSON.stringify(arr));
+}
+
+async function syncFromSheets(){
+  try{
+    const r = await fetch(SHEETS_URL+"?t="+Date.now());
+    const data = await r.json();
+    if(data.result==="success" && data.rows && data.rows.length>0){
+      const rows = data.rows.filter(r=>r["JSON เต็ม"]);
+      const entries = rows.map(r=>{
+        try{ return JSON.parse(r["JSON เต็ม"]); }catch(e){return null;}
+      }).filter(Boolean);
+      if(entries.length>0){
+        localStorage.setItem("isuzu_submissions",JSON.stringify(entries));
+        return true;
+      }
+    }
+  }catch(e){console.log("Sync error:",e);}
+  return false;
 }
 
 function getMyPending(){
@@ -207,6 +227,14 @@ function updateBadge(){
 
 // ===== RENDER APPROVE =====
 function renderApprove(){
+  if(!currentFM) return;
+  // sync from sheets first
+  syncFromSheets().then(()=>{
+    _renderApprove();
+    updateBadge();
+  });
+}
+function _renderApprove(){
   if(!currentFM) return;
   const list = document.getElementById("approveList");
   const pending = getMyPending();
@@ -281,8 +309,15 @@ function approve(id){
   saveSubs(all);
 
   // ส่ง Google Sheets (เปิดเมื่อมี URL)
-  const SHEETS_URL = "https://script.google.com/macros/s/AKfycbx42brqNk3Tf5K2D_MM0YdDHMeu31sZ_KIwrjzwpRaHxqq5sC1Pcy5EZrgkGu9pjfPxpw/exec";
-  fetch(SHEETS_URL,{method:"POST",mode:"no-cors",body:JSON.stringify(all[idx]),headers:{"Content-Type":"application/json"}});
+  const SHEETS_URL = "https://script.google.com/macros/s/AKfycbxFpwj3ZzsQK6CbbyiS-kyuiFPQd_3dNge_VE_7qgjxs5JsbaUN6eGjYkEXS7UfC6Mk/exec";
+  // ส่งไป Sheets
+  const _form = document.createElement("form");
+  _form.method = "POST"; _form.action = SHEETS_URL; _form.target = "h_iframe"; _form.style.display="none";
+  const _inp = document.createElement("input"); _inp.type="hidden"; _inp.name="payload"; _inp.value=JSON.stringify(all[idx]);
+  _form.appendChild(_inp);
+  const _ifr = document.createElement("iframe"); _ifr.name="h_iframe"; _ifr.style.display="none";
+  document.body.appendChild(_ifr); document.body.appendChild(_form); _form.submit();
+  setTimeout(()=>{document.body.removeChild(_form);document.body.removeChild(_ifr);},3000);
 
   updateBadge();
   renderApprove();
