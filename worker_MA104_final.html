@@ -212,14 +212,29 @@ function submitWorker(){
   all.push(entry);
   localStorage.setItem("isuzu_submissions",JSON.stringify(all));
 
-  // ส่งไป Google Sheets
+  // ส่งไป Google Sheets ผ่าน form trick (bypass CORS)
   try {
-    fetch("https://script.google.com/macros/s/AKfycbx42brqNk3Tf5K2D_MM0YdDHMeu31sZ_KIwrjzwpRaHxqq5sC1Pcy5EZrgkGu9pjfPxpw/exec", {
-      method: "POST",
-      mode: "no-cors",
-      body: JSON.stringify(entry),
-      headers: {"Content-Type": "application/json"}
-    });
+    const URL = "https://script.google.com/macros/s/AKfycbxFpwj3ZzsQK6CbbyiS-kyuiFPQd_3dNge_VE_7qgjxs5JsbaUN6eGjYkEXS7UfC6Mk/exec";
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = URL;
+    form.target = "hidden_iframe";
+    form.style.display = "none";
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = "payload";
+    input.value = JSON.stringify(entry);
+    form.appendChild(input);
+    const iframe = document.createElement("iframe");
+    iframe.name = "hidden_iframe";
+    iframe.style.display = "none";
+    document.body.appendChild(iframe);
+    document.body.appendChild(form);
+    form.submit();
+    setTimeout(()=>{
+      document.body.removeChild(form);
+      document.body.removeChild(iframe);
+    }, 3000);
   } catch(e) { console.log("Sheets error:", e); }
 
   // show success
