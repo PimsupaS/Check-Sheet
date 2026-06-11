@@ -228,10 +228,10 @@ const SPECIAL_CHECKS = {
   "jig_FRF_MA1-04": [
     {id:1,name:"พื้นที่รอบบริเวณ JIG",        method:"สายตา",                              standard:"ไม่มีสิ่งของที่ไม่จำเป็นวางอยู่"},
     {id:2,name:"สภาพทั่วไปของ CLAMP",          method:"สายตา, สัมผัส",                      standard:"ไม่หลวมคลอน"},
-    {id:3,name:"ไกด์-ประคองชิ้นส่วน",           method:"สายตา, สัมผัส",                      standard:"ไม่โยก, ไม่หลวมคลอน"},
+    {id:3,name:"โกด-ประดองชิ้นส่วน",           method:"สายตา, สัมผัส",                      standard:"ไม่โยก, ไม่หลวมคลอน"},
     {id:4,name:"PIN, DATUM",                    method:"สายตา, สัมผัส",                      standard:"ไม่มี SPATTER ติด, ไม่หลวมหรือสึกหรอ"},
-    {id:5,name:"PROXIMITY / PHOTO SENSOR\nLIMIT SWITCH / POKAYOKE",method:"สายตา, สัมผัสเหล็กเช็ค Pokayoke",standard:"มีไฟติด, ไม่หลวมคลอน"},
-    {id:6,name:"สภาพสายดิน, กระบอกลม",        method:"สายตา, ฟังเสียง",                    standard:"ไม่แตก, ไม่มีเสียงลมรั่ว"},
+    {id:5,name:"PROXIMITY / PHOTO SENSOR\nLIMIT SWITCH / POKAYOKE",method:"สายตา, สัมผัส, เหล็กเช็ค Pokayoke",standard:"มีไฟติด, ไม่หลวมคลอน"},
+    {id:6,name:"สภาพสายดิน, กรรมอกลม",        method:"สายตา, ฟังเสียง",                    standard:"ไม่แตก, ไม่มีเสียงสมรั้ว"},
   ]
 };
 
@@ -433,15 +433,12 @@ function submitWorker(){
   all.push(entry);
   localStorage.setItem("isuzu_submissions",JSON.stringify(all));
 
-  // ส่งไป Google Sheets
+  // ส่งไป Google Sheets ผ่าน fetch (no-cors)
   try{
-    const form=document.createElement("form");
-    form.method="POST"; form.action=SHEETS_URL; form.target="h_ifr"; form.style.display="none";
-    const inp=document.createElement("input"); inp.type="hidden"; inp.name="payload"; inp.value=JSON.stringify(entry);
-    form.appendChild(inp);
-    const ifr=document.createElement("iframe"); ifr.name="h_ifr"; ifr.style.display="none";
-    document.body.appendChild(ifr); document.body.appendChild(form); form.submit();
-    setTimeout(()=>{try{document.body.removeChild(form);document.body.removeChild(ifr);}catch(e){}},3000);
+    const encoded = encodeURIComponent(JSON.stringify(entry));
+    const img = new Image();
+    img.src = SHEETS_URL + "?payload=" + encoded;
+    console.log("ส่งข้อมูลแล้ว");
   }catch(e){console.log("Sheets error:",e);}
 
   // แสดง success
