@@ -3,202 +3,393 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard — Office</title>
+<title>Dashboard — ISUZU FRG Office</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&display=swap');
-:root{--red:#CC0000;--pass:#057A55;--pass-bg:#ECFDF5;--pass-border:#6EE7B7;--fail-bg:#FFF5F5;--fail-border:#FFBABA;--warn:#D97706;--warn-bg:#FFFBEB;--bg:#F0F0F0;--card:#fff;--text:#1A1A1A;--muted:#6B7280;--border:#E5E7EB;--shadow:0 2px 12px rgba(0,0,0,.08);}
+:root{
+  --red:#CC0000;--red-dark:#A00000;
+  --pass:#057A55;--pass-bg:#ECFDF5;--pass-border:#6EE7B7;
+  --fail:#CC0000;--fail-bg:#FFF5F5;--fail-border:#FFBABA;
+  --warn:#D97706;--warn-bg:#FFFBEB;
+  --bg:#EDEDEE;--card:#fff;--text:#1A1A1A;--muted:#6B7280;--border:#E5E7EB;
+  --shadow:0 1px 6px rgba(0,0,0,.08);
+}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:40px;}
+body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
 /* HEADER */
-.header{background:var(--red);color:#fff;padding:18px 20px 28px;display:flex;justify-content:space-between;align-items:flex-start;}
-.logo{font-size:22px;font-weight:800;letter-spacing:.06em;}
-.logo span{display:block;font-size:11px;font-weight:500;opacity:.65;}
-.header-right{text-align:right;}
-.live-dot{display:inline-block;width:8px;height:8px;background:#4ADE80;border-radius:50%;margin-right:5px;animation:pulse 2s infinite;}
-@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
-.live-text{font-size:12px;font-weight:600;opacity:.9;}
-.last-update{font-size:11px;opacity:.6;margin-top:3px;}
-/* SUMMARY CARDS */
-.summary-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:14px 14px 0;}
-.sum-card{background:var(--card);border-radius:12px;padding:14px 12px;box-shadow:var(--shadow);text-align:center;}
-.sum-num{font-size:28px;font-weight:800;line-height:1;}
-.sum-label{font-size:11px;color:var(--muted);margin-top:4px;font-weight:600;}
+.header{background:var(--red);color:#fff;padding:14px 16px 16px;display:flex;justify-content:space-between;align-items:center;}
+.logo{font-size:18px;font-weight:800;letter-spacing:.05em;}
+.logo span{display:block;font-size:10px;font-weight:500;opacity:.65;}
+.live-wrap{text-align:right;}
+.live-dot{display:inline-block;width:7px;height:7px;background:#4ADE80;border-radius:50%;margin-right:4px;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.live-text{font-size:12px;font-weight:600;}
+.last-update{font-size:10px;opacity:.6;margin-top:2px;}
+
+/* SUMMARY ROW */
+.summary-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 10px 0;}
+.sum-card{background:var(--card);border-radius:10px;padding:10px 8px;text-align:center;box-shadow:var(--shadow);}
+.sum-num{font-size:26px;font-weight:800;line-height:1;}
+.sum-label{font-size:10px;color:var(--muted);margin-top:3px;font-weight:600;}
 .sum-done .sum-num{color:var(--pass);}
-.sum-issue .sum-num{color:var(--red);}
-.sum-wait .sum-num{color:var(--muted);}
-/* SHIFT FILTER */
-.filter-row{display:flex;gap:8px;margin:14px 14px 0;}
-.filter-btn{flex:1;padding:9px;border-radius:8px;border:1.5px solid var(--border);background:var(--card);font-family:'Sarabun',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;color:var(--muted);}
+.sum-fail .sum-num{color:var(--red);}
+.sum-wait .sum-num{color:#9CA3AF;}
+.sum-total .sum-num{color:#1A56DB;}
+
+/* FILTER BAR */
+.filter-bar{display:flex;gap:6px;margin:10px 10px 0;flex-wrap:wrap;align-items:center;}
+.filter-btn{padding:6px 12px;border-radius:6px;border:1.5px solid var(--border);background:var(--card);font-family:'Sarabun',sans-serif;font-size:12px;font-weight:700;cursor:pointer;color:var(--muted);transition:all .15s;}
 .filter-btn.active{background:var(--red);border-color:var(--red);color:#fff;}
-/* STATION GRID */
-.section{margin:14px 14px 0;}
-.section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:8px;}
-.station-grid{display:flex;flex-direction:column;gap:8px;}
-.s-card{background:var(--card);border-radius:12px;border:1.5px solid var(--border);padding:13px 14px;box-shadow:var(--shadow);transition:border-color .2s;}
-.s-card.done{border-left:4px solid var(--pass);}
-.s-card.issue{border-left:4px solid var(--red);}
-.s-card.pending{border-left:4px solid #D1D5DB;}
-.s-top{display:flex;align-items:center;gap:10px;}
-.s-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
-.dot-done{background:var(--pass);} .dot-issue{background:var(--red);} .dot-pending{background:#D1D5DB;}
-.s-name{font-size:15px;font-weight:700;flex:1;}
-.s-chip{font-size:11px;font-weight:700;border-radius:99px;padding:3px 10px;}
-.chip-done{background:var(--pass-bg);color:var(--pass);}
-.chip-issue{background:var(--fail-bg);color:var(--red);}
-.chip-pending{background:#F3F4F6;color:var(--muted);}
-.s-detail{font-size:12px;color:var(--muted);margin-top:5px;padding-left:20px;}
-.s-fail-items{font-size:12px;color:var(--red);margin-top:4px;padding-left:20px;font-weight:500;}
-/* ISSUE ALERT */
-.alert-box{background:var(--fail-bg);border:1.5px solid var(--fail-border);border-radius:12px;padding:13px 14px;margin-bottom:10px;}
-.alert-title{font-size:13px;font-weight:700;color:var(--red);margin-bottom:4px;}
-.alert-body{font-size:12px;color:var(--text);}
+.date-input{border:1.5px solid var(--border);border-radius:6px;padding:5px 8px;font-family:'Sarabun',sans-serif;font-size:12px;outline:none;background:var(--card);}
+.date-input:focus{border-color:var(--red);}
+.export-btn{margin-left:auto;background:#057A55;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-family:'Sarabun',sans-serif;font-size:12px;font-weight:700;cursor:pointer;}
+
+/* ALERT */
+.alert-section{margin:10px 10px 0;}
+.alert-box{background:var(--fail-bg);border:1.5px solid var(--fail-border);border-radius:10px;padding:10px 12px;margin-bottom:6px;}
+.alert-title{font-size:12px;font-weight:700;color:var(--red);margin-bottom:3px;}
+.alert-body{font-size:11px;color:var(--text);line-height:1.6;}
+
+/* DEPT SECTION */
+.dept-section{margin:10px 10px 0;}
+.dept-header{display:flex;align-items:center;gap:8px;margin-bottom:6px;cursor:pointer;user-select:none;}
+.dept-icon{font-size:16px;}
+.dept-name{font-size:13px;font-weight:800;color:var(--text);}
+.dept-stats{margin-left:auto;font-size:11px;color:var(--muted);font-weight:600;}
+.dept-toggle{font-size:12px;color:var(--muted);}
+
+/* GROUP TABLE */
+.group-wrap{background:var(--card);border-radius:10px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:10px;}
+.group-title-bar{background:#F3F4F6;padding:7px 12px;font-size:12px;font-weight:700;color:var(--text);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+.group-stats{margin-left:auto;font-size:11px;color:var(--muted);}
+
+/* STAGE GRID inside group */
+.stage-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:1px;background:var(--border);}
+.stage-cell{background:var(--card);padding:8px 6px;text-align:center;position:relative;}
+.stage-cell.done{background:var(--pass-bg);}
+.stage-cell.fail{background:var(--fail-bg);}
+.stage-cell.pending{background:#FAFAFA;}
+.stage-cell.partial{background:var(--warn-bg);}
+.stage-name{font-size:11px;font-weight:700;line-height:1.2;margin-bottom:4px;word-break:break-all;}
+.shift-row{display:flex;gap:3px;justify-content:center;}
+.shift-tag{font-size:9px;font-weight:700;padding:2px 5px;border-radius:4px;line-height:1;}
+.shift-done{background:var(--pass-bg);color:var(--pass);border:1px solid var(--pass-border);}
+.shift-fail{background:var(--fail-bg);color:var(--red);border:1px solid var(--fail-border);}
+.shift-wait{background:#F3F4F6;color:#9CA3AF;border:1px solid #E5E7EB;}
+.stage-time{font-size:9px;color:var(--muted);margin-top:3px;}
+.fail-dot{width:6px;height:6px;background:var(--red);border-radius:50%;position:absolute;top:5px;right:5px;}
+
+/* TOOLTIP on hover */
+.stage-cell{cursor:default;}
+.stage-cell:hover{z-index:10;}
+
+/* LEGEND */
+.legend{display:flex;gap:12px;margin:10px 10px 4px;flex-wrap:wrap;}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);}
+.legend-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+
 /* refresh */
-.refresh-bar{display:flex;align-items:center;justify-content:space-between;margin:14px 14px 0;}
-.refresh-btn{background:var(--card);border:1.5px solid var(--border);border-radius:8px;padding:7px 14px;font-family:'Sarabun',sans-serif;font-size:13px;font-weight:600;cursor:pointer;color:var(--text);}
-.refresh-btn:hover{background:#F3F4F6;}
-.auto-text{font-size:11px;color:var(--muted);}
+.refresh-bar{display:flex;align-items:center;justify-content:space-between;margin:8px 10px 0;}
+.countdown-text{font-size:11px;color:var(--muted);}
+.refresh-btn{background:var(--card);border:1.5px solid var(--border);border-radius:6px;padding:5px 12px;font-family:'Sarabun',sans-serif;font-size:12px;font-weight:600;cursor:pointer;}
+
+/* Collapsed dept */
+.dept-body{transition:all .2s;}
+.dept-body.collapsed{display:none;}
+
+@media(min-width:600px){
+  .stage-grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));}
+  .summary-row{grid-template-columns:repeat(4,1fr);}
+}
 </style>
 </head>
 <body>
 
+<!-- HEADER -->
 <div class="header">
   <div>
-    <div class="logo">ISUZU <span>FRG · Office Dashboard</span></div>
-    <div style="font-size:13px;opacity:.8;margin-top:8px;" id="headerDate">—</div>
+    <div class="logo">ISUZU FRG <span>Office Dashboard · Real-time</span></div>
+    <div style="font-size:11px;opacity:.75;margin-top:4px;" id="headerDate"></div>
   </div>
-  <div class="header-right">
+  <div class="live-wrap">
     <div><span class="live-dot"></span><span class="live-text">LIVE</span></div>
-    <div class="last-update" id="lastUpdate">—</div>
+    <div class="last-update" id="lastUpdate">กำลังโหลด...</div>
   </div>
 </div>
 
 <!-- SUMMARY -->
 <div class="summary-row">
-  <div class="sum-card sum-done"><div class="sum-num" id="sumDone">0</div><div class="sum-label">ตรวจแล้ว</div></div>
-  <div class="sum-card sum-issue"><div class="sum-num" id="sumIssue">0</div><div class="sum-label">พบปัญหา</div></div>
+  <div class="sum-card sum-total"><div class="sum-num" id="sumTotal">0</div><div class="sum-label">ทั้งหมด</div></div>
+  <div class="sum-card sum-done"><div class="sum-num" id="sumDone">0</div><div class="sum-label">ผ่านแล้ว</div></div>
+  <div class="sum-card sum-fail"><div class="sum-num" id="sumFail">0</div><div class="sum-label">พบปัญหา</div></div>
   <div class="sum-card sum-wait"><div class="sum-num" id="sumWait">0</div><div class="sum-label">รอตรวจ</div></div>
 </div>
 
 <!-- FILTER -->
-<div class="filter-row">
+<div class="filter-bar">
   <button class="filter-btn active" onclick="setShift('ALL',this)">ทั้งหมด</button>
   <button class="filter-btn" onclick="setShift('A',this)">SHIFT A</button>
   <button class="filter-btn" onclick="setShift('B',this)">SHIFT B</button>
+  <input type="date" class="date-input" id="filterDate" onchange="renderDashboard()">
+  <button class="export-btn" onclick="exportCSV()">📥 Export</button>
 </div>
 
-<!-- DATE FILTER -->
-<div class="filter-row" style="margin-top:8px;">
-  <button class="filter-btn active" id="dateBtn-today" onclick="setDateMode('today',this)">วันนี้</button>
-  <button class="filter-btn" id="dateBtn-week" onclick="setDateMode('week',this)">สัปดาห์นี้</button>
-  <button class="filter-btn" id="dateBtn-month" onclick="setDateMode('month',this)">เดือนนี้</button>
-  <button class="filter-btn" id="dateBtn-custom" onclick="setDateMode('custom',this)">กำหนดเอง</button>
-</div>
-<div id="customDateRow" style="display:none;margin:8px 14px 0;display:none;gap:8px;align-items:center;">
-  <input type="date" id="dateFrom" onchange="renderDashboard()" style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-family:'Sarabun',sans-serif;font-size:13px;outline:none;">
-  <span style="color:var(--muted);font-size:13px;">ถึง</span>
-  <input type="date" id="dateTo" onchange="renderDashboard()" style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-family:'Sarabun',sans-serif;font-size:13px;outline:none;">
+<!-- LEGEND -->
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--pass-bg);border:1px solid var(--pass-border);"></div>ผ่าน</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--fail-bg);border:1px solid var(--fail-border);"></div>พบปัญหา</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--warn-bg);border:1px solid #FCD34D;"></div>ผ่านบางกะ</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#FAFAFA;border:1px solid var(--border);"></div>รอตรวจ</div>
 </div>
 
-<!-- EXPORT -->
-<div style="margin:8px 14px 0;display:flex;gap:8px;">
-  <button onclick="exportExcel()" style="flex:1;background:#057A55;color:white;border:none;border-radius:8px;padding:10px;font-family:'Sarabun',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">📥 Export Excel</button>
-  <button onclick="exportPrint()" style="flex:1;background:#1A56DB;color:white;border:none;border-radius:8px;padding:10px;font-family:'Sarabun',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">🖨 พิมพ์รายงาน</button>
+<!-- ALERTS -->
+<div class="alert-section" id="alertSection" style="display:none;">
+  <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--red);margin-bottom:6px;">⚠ แจ้งเตือนปัญหา</div>
+  <div id="alertList"></div>
 </div>
 
-<!-- ISSUES -->
-<div class="section" id="issueSection" style="display:none;">
-  <div class="section-title" style="color:var(--red);">⚠ แจ้งเตือนปัญหา</div>
-  <div id="issueList"></div>
-</div>
-
-<!-- REFRESH BAR -->
+<!-- REFRESH -->
 <div class="refresh-bar">
-  <div class="auto-text" id="countdownText">รีเฟรชอัตโนมัติใน 30 วิ</div>
-  <button class="refresh-btn" onclick="refresh()">🔄 รีเฟรชเดี๋ยวนี้</button>
+  <div class="countdown-text" id="countdownText">รีเฟรชอัตโนมัติใน 30 วิ</div>
+  <button class="refresh-btn" onclick="refresh()">🔄 รีเฟรช</button>
 </div>
 
-<!-- STATIONS -->
-<div class="section">
-  <div class="section-title">สถานะทุก Station</div>
-  <div class="station-grid" id="stationGrid"></div>
-</div>
+<!-- MAIN CONTENT -->
+<div id="mainContent"></div>
 
 <script>
-// ============================================================
-// ALL STATIONS ที่มีในโรงงาน (ใส่เพิ่มได้ตามจริง)
-// ============================================================
-const ALL_STATIONS = [
-  "MA1-04","MA1-05","MA1-06","MA1-07","MA1-08",
-  "MA1-09","MA1-10","MA1-11","MA1-12","MA1-13",
+const SHEETS_URL = "https://script.google.com/macros/s/AKfycbxFpwj3ZzsQK6CbbyiS-kyuiFPQd_3dNge_VE_7qgjxs5JsbaUN6eGjYkEXS7UfC6Mk/exec";
+
+// ALL STATIONS DATA
+const DEPT_DATA = [
+  { id:"jig", name:"Jig", icon:"🔧", groups:{
+    FRF:["SA1-01 4x4 LH","SA1-01 4x4 RH","SA1-01 4x2 LH","SA1-01 4x2 RH","SA1-02 LH","SA1-02 RH","MA1-00","MA1-02","MA1-03","MA1-04","MA1-05","MA1-06","MA1-07","MA1-08","MA1-09"],
+    FRR:["SC1-01 LH","SC1-01 RH","SC1-02 LH","SC1-02 RH","MC1-0.5","MC1-01","MC1-02","MC1-03","MC1-04","MC1-05","MC1-06","MC1-07","MC1-08","MC1-09","MC1-10"],
+    FRC:["CP1-02","CP1-03","CP1-04","CP1-05"],
+    FRU:["SA2-01 4x4 LH","SA2-01 4x4 RH","SA2-01 4x2 LH","SA2-01 4x2 RH","SA2-02 LH","SA2-02 RH","MA2-01","MA2-02","MA2-03","MA2-04","MA2-05","MA2-06","MA2-07","MA2-08","MA2-09"],
+    FRX:["SC2-01 RG LH","SC2-01 RG RH","SC2-02 LH","SC2-02 RH","MC2-01","MC2-02","MC2-03","MC2-04","MC2-05","MC2-06","MC2-07","MC2-08","MC2-09","MC2-10"],
+    FXC:["CP2-02","CP2-03","CP2-04","CP2-05"],
+  }},
+  { id:"robot", name:"Robot", icon:"🤖", groups:{
+    FRF:["SA1-01-W1","SA1-01-W2","SA1-02-W1","SA1-02-W2","MA1-02-W1","MA1-02-W2","MA1-02-W3","MA1-02-W4","MA1-04-W1","MA1-04-W2","MA1-04-W3","MA1-04-W4","MA1-04-W5","MA1-04-W6","MA1-06-W1","MA1-06-W2","MA1-06-W3","MA1-06-W4"],
+    FRR:["SC1-01-W1","SC1-01-W2","SC1-01-W3","SC1-02-W1","SC1-02-W2","SC1-02-W3","MC1-02-W1","MC1-02-W2","MC1-02-W3","MC1-02-W4","MC1-04-W1","MC1-04-W2","MC1-04-W3","MC1-04-W4","MC1-05-W1","MC1-05-W2","MC1-05-W3","MC1-05-W4","MC1-07-W1","MC1-07-W2"],
+    FRC:["CP1-03-W1","CP1-03-W2","CP1-03-W3","CP1-03-W4","CP1-03-W5","CP1-03-W6"],
+    FRU:["SA2-01-W1","SA2-01-W2","SA2-02-W1","SA2-02-W2","MA2-02-W1","MA2-02-W2","MA2-02-W3","MA2-02-W4","MA2-04-W1","MA2-04-W2","MA2-04-W3","MA2-04-W4","MA2-04-W5","MA2-04-W6","MA2-06-W1","MA2-06-W2"],
+    FRX:["SC2-01-W1","SC2-01-W2","SC2-01-W3","SC2-02-W1","SC2-02-W2","SC2-02-W3","MC2-02-W1","MC2-02-W2","MC2-02-W3","MC2-02-W4","MC2-04-W1","MC2-04-W2","MC2-04-W3","MC2-04-W4","MC2-05-W1","MC2-05-W2"],
+    FXC:["CP2-03-W1","CP2-03-W2","CP2-03-W3","CP2-03-W4","CP2-03-W5","CP2-03-W6"],
+  }},
+  { id:"hoist", name:"Hoist", icon:"⚙️", groups:{
+    FRF:["SA1-01","MA1-00"], FRR:["SC1-01"], FRU:["SA2-01","MA2-01"], FRX:["SC2-01","MC2-01"],
+  }},
+  { id:"air", name:"Air Service Unit", icon:"💨", groups:{
+    FRF:["FRL-SA1-01","FRL-SA1-02","FRL-SA1-03","FRL-MA1-01"],
+    FRR:["FRL-SC1-01","FRL-SC1-02","FRL-SC1-03","FRL-MC1-01","FRL-MC1-02","FRL-MC1-03","FRL-MC1-04","FRL-MC1-05","FRL-MC1-06","FRL-MC1-07","FRL-MC1-08","FRL-MC1-09","FRL-MC1-10","FRL-MC1-11","FRL-MC1-12","FRL-MC1-13","FRL-MC1-14","FRL-MC1-15","FRL-MC1-16","FRL-MC1-17","FRL-MC1-18"],
+    FRU:["FRL-SA2-01","FRL-SA2-02","FRL-SA2-03","FRL-MC-01","FRL-MC-02","FRL-MC-03","FRL-MC-04","FRL-MC-05","FRL-MC-06","FRL-MC-07","FRL-MC-08","FRL-MC-09","FRL-MC-10","FRL-MC-11","FRL-MC-12","FRL-MC-13","FRL-MC-14","FRL-MC-15"],
+    FRX:["FRL-SC2-01","FRL-SC2-02","FRL-SC2-03","FRL-MC2-01","FRL-MC2-02","FRL-MC2-03","FRL-MC2-04","FRL-MC2-05","FRL-MC2-06","FRL-MC2-07","FRL-MC2-08","FRL-MC2-09","FRL-MC2-10","FRL-MC2-11","FRL-MC2-12","FRL-MC2-13","FRL-MC2-14","FRL-MC2-15"],
+  }},
+  { id:"co2", name:"ตู้เชื่อม CO2", icon:"🔥", groups:{
+    FRR:["SC1-02","MC1-8.5 LH","MC1-8.5 RH","MC1-10 LH","MC1-10 RH"],
+  }},
+  { id:"magnet", name:"Hoist แม่เหล็ก", icon:"🧲", groups:{
+    FRR:["MC1-0.5"],
+  }},
 ];
 
 let currentShift = "ALL";
-let dateMode = "today";
-let dateFrom = "";
-let dateTo = "";
-
-function setDateMode(mode, btn){
-  dateMode = mode;
-  document.querySelectorAll("[id^='dateBtn-']").forEach(b=>b.classList.remove("active"));
-  btn.classList.add("active");
-  const customRow = document.getElementById("customDateRow");
-  if(mode === "custom"){
-    customRow.style.display = "flex";
-    const t = new Date().toISOString().split("T")[0];
-    document.getElementById("dateFrom").value = t;
-    document.getElementById("dateTo").value = t;
-  } else {
-    customRow.style.display = "none";
-  }
-  renderDashboard();
-}
-
-function getDateRange(){
-  const now = new Date();
-  const todayStr = now.toISOString().split("T")[0];
-  if(dateMode === "today") return { from: todayStr, to: todayStr };
-  if(dateMode === "week"){
-    const day = now.getDay();
-    const mon = new Date(now); mon.setDate(now.getDate() - (day===0?6:day-1));
-    const sun = new Date(mon); sun.setDate(mon.getDate()+6);
-    return { from: mon.toISOString().split("T")[0], to: sun.toISOString().split("T")[0] };
-  }
-  if(dateMode === "month"){
-    const from = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-01`;
-    const lastDay = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
-    const to = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(lastDay).padStart(2,"0")}`;
-    return { from, to };
-  }
-  if(dateMode === "custom"){
-    return {
-      from: document.getElementById("dateFrom")?.value || todayStr,
-      to: document.getElementById("dateTo")?.value || todayStr
-    };
-  }
-  return { from: todayStr, to: todayStr };
-}
 let countdown = 30;
 let countdownTimer;
+let allSubs = [];
+let deptCollapsed = {};
 
+// INIT
+const today = new Date();
+document.getElementById("filterDate").value = today.toISOString().split("T")[0];
 document.getElementById("headerDate").textContent =
-  new Date().toLocaleDateString("th-TH",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
-const todayISO = new Date().toISOString().split("T")[0];
+  today.toLocaleDateString("th-TH",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
 
 function setShift(s, btn){
-  currentShift=s;
+  currentShift = s;
   document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active"));
   btn.classList.add("active");
   renderDashboard();
 }
 
-const SHEETS_URL = "https://script.google.com/macros/s/AKfycbxFpwj3ZzsQK6CbbyiS-kyuiFPQd_3dNge_VE_7qgjxs5JsbaUN6eGjYkEXS7UfC6Mk/exec";
-
 function getSubs(){
   return JSON.parse(localStorage.getItem("isuzu_submissions")||"[]");
 }
 
+async function syncFromSheets(){
+  try{
+    const r = await fetch(SHEETS_URL+"?t="+Date.now());
+    const data = await r.json();
+    if(data.result==="success" && data.rows && data.rows.length>0){
+      const entries = data.rows.map(row=>{
+        try{ return JSON.parse(row["JSON เต็ม"]||"{}"); }
+        catch(e){
+          return {
+            id:row["ID"]||"",
+            date:String(row["วันที่"]||"").split("T")[0],
+            shift:row["กะ"]||"", stage:row["Stage"]||"",
+            group:row["Group"]||"", dept:row["dept"]||"",
+            dept_name:row["แผนก"]||"", worker:row["Worker"]||"",
+            foreman:row["Foreman"]||"",
+            timestamp_worker:row["เวลา Worker"]||"",
+            timestamp_foreman:row["เวลา Foreman"]||"",
+            remark:row["หมายเหตุ"]||"",
+            status:row["สถานะ"]||"approved", checks:[]
+          };
+        }
+      }).filter(e=>e&&e.id);
+      allSubs = entries;
+      localStorage.setItem("isuzu_submissions",JSON.stringify(entries));
+    }
+  }catch(e){ console.log("Sync error:",e); allSubs = getSubs(); }
+}
+
+function renderDashboard(){
+  const dateVal = document.getElementById("filterDate").value;
+  const subs = allSubs.filter(s=>{
+    const d = String(s.date||"").split("T")[0];
+    const shiftOk = currentShift==="ALL" || s.shift===currentShift;
+    return d===dateVal && s.status==="approved" && shiftOk;
+  });
+
+  document.getElementById("lastUpdate").textContent =
+    "อัปเดต "+new Date().toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+
+  // Count totals
+  let totalStages=0, doneCount=0, failCount=0, waitCount=0;
+  const alerts = [];
+
+  // Build main content
+  const main = document.getElementById("mainContent");
+  main.innerHTML = "";
+
+  DEPT_DATA.forEach(dept=>{
+    const deptEl = document.createElement("div");
+    deptEl.className = "dept-section";
+
+    let deptDone=0, deptFail=0, deptTotal=0;
+    let groupsHTML = "";
+
+    Object.entries(dept.groups).forEach(([grp, stages])=>{
+      let grpDone=0, grpFail=0;
+      let stagesHTML = "";
+
+      stages.forEach(stage=>{
+        totalStages++;
+        deptTotal++;
+
+        // find subs for this stage
+        const stageSubs = subs.filter(s=>
+          s.stage===stage && s.group===grp &&
+          (s.dept===dept.id || s.dept_name===dept.name)
+        );
+        const shiftA = stageSubs.find(s=>s.shift==="A");
+        const shiftB = stageSubs.find(s=>s.shift==="B");
+
+        const shifts = currentShift==="ALL" ? ["A","B"] : [currentShift];
+        const shiftResults = shifts.map(sh=>{
+          const sub = stageSubs.find(s=>s.shift===sh);
+          if(!sub) return {sh, status:"wait"};
+          const hasFail = (sub.checks||[]).some(c=>c.result==="fail");
+          return {sh, status:hasFail?"fail":"done", sub};
+        });
+
+        const allWait = shiftResults.every(r=>r.status==="wait");
+        const anyFail = shiftResults.some(r=>r.status==="fail");
+        const anyDone = shiftResults.some(r=>r.status!=="wait");
+
+        // cell class
+        let cellClass = "pending";
+        if(anyFail){ cellClass="fail"; deptFail++; grpFail++; failCount++; doneCount++; }
+        else if(!allWait && anyDone){ cellClass="done"; deptDone++; grpDone++; doneCount++; }
+        else if(anyDone){ cellClass="partial"; deptDone++; grpDone++; doneCount++; }
+        else { waitCount++; }
+
+        // time display
+        const latestSub = stageSubs.sort((a,b)=>new Date(b.timestamp_foreman||0)-new Date(a.timestamp_foreman||0))[0];
+        const timeStr = latestSub?.timestamp_foreman
+          ? new Date(latestSub.timestamp_foreman).toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"})
+          : "";
+
+        // shift tags
+        const shiftTagsHTML = shiftResults.map(r=>{
+          const cls = r.status==="done"?"shift-done":r.status==="fail"?"shift-fail":"shift-wait";
+          const txt = r.status==="done"?"✓":r.status==="fail"?"✗":"—";
+          return `<span class="shift-tag ${cls}">${r.sh}${txt}</span>`;
+        }).join("");
+
+        // alerts
+        shiftResults.filter(r=>r.status==="fail").forEach(r=>{
+          const failNames = (r.sub.checks||[]).filter(c=>c.result==="fail").map(c=>c.name.replace(/\n/g," ")).join(", ");
+          alerts.push({dept:dept.name, grp, stage, shift:r.sh, worker:r.sub.worker, failNames, remark:r.sub.remark||""});
+        });
+
+        stagesHTML += `
+          <div class="stage-cell ${cellClass}">
+            ${anyFail?'<div class="fail-dot"></div>':""}
+            <div class="stage-name">${stage}</div>
+            <div class="shift-row">${shiftTagsHTML}</div>
+            ${timeStr?`<div class="stage-time">${timeStr}</div>`:""}
+          </div>`;
+      });
+
+      const grpPassPct = stages.length>0 ? Math.round((grpDone/stages.length)*100) : 0;
+      groupsHTML += `
+        <div class="group-wrap">
+          <div class="group-title-bar">
+            <span style="font-size:13px;">🏭</span>
+            <span>${grp}</span>
+            <span class="group-stats">${grpDone}/${stages.length} ผ่าน ${grpFail>0?`· <span style="color:var(--red)">⚠${grpFail}</span>`:""}</span>
+          </div>
+          <div class="stage-grid">${stagesHTML}</div>
+        </div>`;
+    });
+
+    const isCollapsed = deptCollapsed[dept.id] || false;
+    deptEl.innerHTML = `
+      <div class="dept-header" onclick="toggleDept('${dept.id}')">
+        <span class="dept-icon">${dept.icon}</span>
+        <span class="dept-name">${dept.name}</span>
+        <span class="dept-stats">${deptDone}/${deptTotal} · ⚠${deptFail}</span>
+        <span class="dept-toggle">${isCollapsed?"▶":"▼"}</span>
+      </div>
+      <div class="dept-body ${isCollapsed?"collapsed":""}" id="dept-body-${dept.id}">
+        ${groupsHTML}
+      </div>`;
+    main.appendChild(deptEl);
+  });
+
+  // Summary
+  document.getElementById("sumTotal").textContent = totalStages;
+  document.getElementById("sumDone").textContent = doneCount;
+  document.getElementById("sumFail").textContent = failCount;
+  document.getElementById("sumWait").textContent = waitCount;
+
+  // Alerts
+  const alertSection = document.getElementById("alertSection");
+  const alertList = document.getElementById("alertList");
+  if(alerts.length){
+    alertSection.style.display="block";
+    alertList.innerHTML = alerts.map(a=>`
+      <div class="alert-box">
+        <div class="alert-title">⚠ ${a.dept} · ${a.grp} · ${a.stage} · SHIFT ${a.shift}</div>
+        <div class="alert-body">Worker: ${a.worker} · ปัญหา: ${a.failNames}${a.remark?` · หมายเหตุ: ${a.remark}`:""}</div>
+      </div>`).join("");
+  } else {
+    alertSection.style.display="none";
+  }
+}
+
+function toggleDept(id){
+  deptCollapsed[id] = !deptCollapsed[id];
+  renderDashboard();
+}
+
 function refresh(){
-  fetchFromSheets().then(()=>renderDashboard());
+  syncFromSheets().then(()=>renderDashboard());
   resetCountdown();
 }
 
@@ -208,255 +399,40 @@ function resetCountdown(){
   countdownTimer = setInterval(()=>{
     countdown--;
     document.getElementById("countdownText").textContent=`รีเฟรชอัตโนมัติใน ${countdown} วิ`;
-    if(countdown<=0){ refresh(); }
+    if(countdown<=0) refresh();
   },1000);
 }
 
-async function fetchFromSheets(){
-  try {
-    const r = await fetch(SHEETS_URL + "?t=" + Date.now());
-    const data = await r.json();
-    if(data.result==="success" && data.rows){
-      // merge with localStorage
-      const local = JSON.parse(localStorage.getItem("isuzu_submissions")||"[]");
-      const sheetsIds = data.rows.map(r=>r["ID"]);
-      // rebuild from sheets rows
-      const fromSheets = data.rows.map(row=>{
-        try{
-          const json = JSON.parse(row["JSON เต็ม"]||"{}");
-          return {...json, status: row["สถานะ"]||json.status||"approved"};
-        }catch(e){
-          return {
-            id: row["ID"]||"", date: String(row["วันที่"]||"").split("T")[0]||"",
-            shift: row["กะ"]||"", stage: row["Stage"]||"", group: row["Group"]||"",
-            dept_name: row["แผนก"]||"", worker: row["Worker"]||"", foreman: row["Foreman"]||"",
-            timestamp_worker: row["เวลา Worker"]||"", timestamp_foreman: row["เวลา Foreman"]||"",
-            remark: row["หมายเหตุ"]||"", status: row["สถานะ"]||"approved", checks:[]
-          };
-        }
-      });
-      localStorage.setItem("isuzu_submissions", JSON.stringify(fromSheets));
-    }
-  } catch(e){ console.log("Sheets fetch error:",e); }
-}
-
-function renderDashboard(){
-  const all = getSubs();
-  const range = getDateRange();
-  const todaySubs = all.filter(s=>{
-    const d = typeof s.date === "string" ? s.date.split("T")[0] : String(s.date).split("T")[0];
-    return d >= range.from && d <= range.to && s.status === "approved";
-  });
-  const filtered = currentShift==="ALL" ? todaySubs : todaySubs.filter(s=>s.shift===currentShift);
-
-  // update timestamp
-  document.getElementById("lastUpdate").textContent =
-    "อัปเดต "+new Date().toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
-
-  // summary
-  const stations = currentShift==="ALL" ? ALL_STATIONS : ALL_STATIONS;
-  let doneCount=0, issueCount=0, waitCount=0;
-  const issueItems=[];
-
-  const grid = document.getElementById("stationGrid");
-  grid.innerHTML="";
-
-  stations.forEach(st=>{
-    const stSubs = filtered.filter(s=>s.stage===st);
-    const shiftFilter = currentShift==="ALL" ? ["A","B"] : [currentShift];
-
-    // check each shift
-    const results = shiftFilter.map(sh=>{
-      const sub = stSubs.find(s=>s.shift===sh);
-      if(!sub) return {shift:sh, status:"pending"};
-      const hasFail = sub.checks.some(c=>c.result==="fail");
-      return {shift:sh, status:hasFail?"issue":"done", sub};
-    });
-
-    // overall
-    const allPending = results.every(r=>r.status==="pending");
-    const anyIssue = results.some(r=>r.status==="issue");
-    const anyDone = results.some(r=>r.status!=="pending");
-
-    if(allPending) waitCount++;
-    else if(anyIssue) { issueCount++; doneCount++; }
-    else { doneCount++; }
-
-    const overallClass = allPending?"pending":anyIssue?"issue":"done";
-    const chipClass = allPending?"chip-pending":anyIssue?"chip-issue":"chip-done";
-    const chipText = allPending?"รอตรวจสอบ":anyIssue?"⚠ พบปัญหา":"✓ ผ่านแล้ว";
-    const dotClass = allPending?"dot-pending":anyIssue?"dot-issue":"dot-done";
-
-    // collect issues
-    if(anyIssue){
-      results.filter(r=>r.status==="issue").forEach(r=>{
-        const failNames = r.sub.checks.filter(c=>c.result==="fail").map(c=>c.name.replace(/\n/g," ")).join(", ");
-        issueItems.push({stage:st, shift:r.shift, worker:r.sub.worker, failNames, remark:r.sub.remark});
-      });
-    }
-
-    // detail rows
-    const detailRows = results.map(r=>{
-      if(r.status==="pending") return `<div class="s-detail">SHIFT ${r.shift}: รอตรวจสอบ</div>`;
-      const failC = r.sub.checks.filter(c=>c.result==="fail").length;
-      const passC = r.sub.checks.filter(c=>c.result==="pass").length;
-      const t = new Date(r.sub.timestamp_foreman||r.sub.timestamp_worker).toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"});
-      let html=`<div class="s-detail">SHIFT ${r.shift}: ผ่าน ${passC}/${r.sub.checks.length} · อนุมัติ ${t} (${r.sub.foreman||r.sub.worker})</div>`;
-      if(failC>0){
-        const fn=r.sub.checks.filter(c=>c.result==="fail").map(c=>c.name.replace(/\n/g," ")).join(", ");
-        html+=`<div class="s-fail-items">✗ ${fn}</div>`;
-      }
-      return html;
-    }).join("");
-
-    grid.innerHTML+=`
-      <div class="s-card ${overallClass}">
-        <div class="s-top">
-          <div class="s-dot ${dotClass}"></div>
-          <div class="s-name">Stage ${st}</div>
-          <span class="s-chip ${chipClass}">${chipText}</span>
-        </div>
-        ${detailRows}
-      </div>
-    `;
-  });
-
-  // summary numbers
-  document.getElementById("sumDone").textContent=doneCount;
-  document.getElementById("sumIssue").textContent=issueCount;
-  document.getElementById("sumWait").textContent=waitCount;
-
-  // issue alerts
-  const issueSection = document.getElementById("issueSection");
-  const issueList = document.getElementById("issueList");
-  if(issueItems.length){
-    issueSection.style.display="block";
-    issueList.innerHTML = issueItems.map(i=>`
-      <div class="alert-box">
-        <div class="alert-title">⚠ Stage ${i.stage} · SHIFT ${i.shift}</div>
-        <div class="alert-body">Worker: ${i.worker}<br>รายการ: ${i.failNames}${i.remark?`<br>หมายเหตุ: ${i.remark}`:""}</div>
-      </div>
-    `).join("");
-  } else {
-    issueSection.style.display="none";
-  }
-}
-
-fetchFromSheets().then(()=>renderDashboard());
-resetCountdown();
-
-// ============================================================
-// EXPORT FUNCTIONS
-// ============================================================
-function getFilteredSubs(){
-  const all = getSubs();
-  const range = getDateRange();
-  const filtered = all.filter(s=>{
-    const d = typeof s.date==="string" ? s.date.split("T")[0] : String(s.date).split("T")[0];
+function exportCSV(){
+  const dateVal = document.getElementById("filterDate").value;
+  const subs = allSubs.filter(s=>{
+    const d = String(s.date||"").split("T")[0];
     const shiftOk = currentShift==="ALL" || s.shift===currentShift;
-    return d>=range.from && d<=range.to && s.status==="approved" && shiftOk;
+    return d===dateVal && s.status==="approved" && shiftOk;
   });
-  return filtered;
-}
+  if(!subs.length){ alert("ไม่มีข้อมูลในวันที่เลือก"); return; }
 
-function exportExcel(){
-  const subs = getFilteredSubs();
-  if(!subs.length){ alert("ไม่มีข้อมูลในช่วงเวลาที่เลือก"); return; }
-
-  const range = getDateRange();
-  let csv = "\uFEFF"; // BOM for Thai
+  let csv = "\uFEFF";
   csv += "วันที่,กะ,แผนก,Group,Stage,Worker,Foreman,เวลาส่ง,เวลาอนุมัติ,ผ่าน,ไม่ผ่าน,รายการไม่ผ่าน,หมายเหตุ\n";
-
   subs.forEach(s=>{
-    const checks = s.checks||[];
-    const passC = checks.filter(c=>c.result==="pass").length;
-    const failC = checks.filter(c=>c.result==="fail").length;
-    const failNames = checks.filter(c=>c.result==="fail").map(c=>c.name.replace(/\n/g," ")).join("; ");
-    const tw = s.timestamp_worker ? new Date(s.timestamp_worker).toLocaleString("th-TH") : "";
-    const tf = s.timestamp_foreman ? new Date(s.timestamp_foreman).toLocaleString("th-TH") : "";
-    const row = [
-      s.date||"", s.shift||"", s.dept_name||"", s.group||"", s.stage||"",
-      s.worker||"", s.foreman||"", tw, tf,
-      passC, failC,
-      `"${failNames}"`,
-      `"${(s.remark||"").replace(/"/g,"'")}"`
-    ];
-    csv += row.join(",") + "\n";
+    const checks=s.checks||[];
+    const passC=checks.filter(c=>c.result==="pass").length;
+    const failC=checks.filter(c=>c.result==="fail").length;
+    const failNames=checks.filter(c=>c.result==="fail").map(c=>c.name.replace(/\n/g," ")).join("; ");
+    const tw=s.timestamp_worker?new Date(s.timestamp_worker).toLocaleString("th-TH"):"";
+    const tf=s.timestamp_foreman?new Date(s.timestamp_foreman).toLocaleString("th-TH"):"";
+    csv+=`${s.date||""},${s.shift||""},${s.dept_name||""},${s.group||""},${s.stage||""},${s.worker||""},${s.foreman||""},${tw},${tf},${passC},${failC},"${failNames}","${(s.remark||"").replace(/"/g,"'")}"\n`;
   });
-
-  const blob = new Blob([csv], {type:"text/csv;charset=utf-8;"});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `ISUZU_JIG_Report_${range.from}_to_${range.to}.csv`;
-  a.click();
+  const blob=new Blob([csv],{type:"text/csv;charset=utf-8;"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url; a.download=`ISUZU_Report_${dateVal}.csv`; a.click();
   URL.revokeObjectURL(url);
 }
 
-function exportPrint(){
-  const subs = getFilteredSubs();
-  if(!subs.length){ alert("ไม่มีข้อมูลในช่วงเวลาที่เลือก"); return; }
-  const range = getDateRange();
-
-  // Group by dept → group → stage
-  const grouped = {};
-  subs.forEach(s=>{
-    const dept = s.dept_name || "อื่นๆ";
-    const grp = s.group || "-";
-    const key = dept+"_"+grp;
-    if(!grouped[key]) grouped[key] = { dept, group:grp, stages:{} };
-    if(!grouped[key].stages[s.stage]) grouped[key].stages[s.stage] = [];
-    grouped[key].stages[s.stage].push(s);
-  });
-
-  let html = `
-    <html><head><meta charset="UTF-8">
-    <style>
-      body{font-family:sans-serif;font-size:12px;margin:20px;}
-      h1{font-size:16px;color:#CC0000;margin-bottom:4px;}
-      h2{font-size:13px;background:#CC0000;color:white;padding:4px 8px;margin:16px 0 4px;}
-      table{width:100%;border-collapse:collapse;margin-bottom:12px;}
-      th{background:#CC0000;color:white;padding:5px 8px;font-size:11px;text-align:left;}
-      td{border:1px solid #ddd;padding:4px 8px;font-size:11px;}
-      tr:nth-child(even){background:#f9f9f9;}
-      .pass{color:#057A55;font-weight:700;}
-      .fail{color:#CC0000;font-weight:700;}
-      @media print{body{margin:10px;}}
-    </style></head><body>
-    <h1>ISUZU FRG — รายงานตรวจสอบ JIG</h1>
-    <p>ช่วงวันที่: ${range.from} ถึง ${range.to} | SHIFT: ${currentShift}</p>
-  `;
-
-  Object.values(grouped).forEach(g=>{
-    html += `<h2>${g.dept} — ${g.group}</h2>`;
-    html += `<table><tr><th>Stage</th><th>วันที่</th><th>กะ</th><th>Worker</th><th>Foreman</th><th>ผล</th><th>รายการไม่ผ่าน</th><th>หมายเหตุ</th></tr>`;
-    Object.entries(g.stages).forEach(([stage, entries])=>{
-      entries.forEach(s=>{
-        const checks = s.checks||[];
-        const failC = checks.filter(c=>c.result==="fail").length;
-        const failNames = checks.filter(c=>c.result==="fail").map(c=>c.name.replace(/\n/g," ")).join(", ");
-        html += `<tr>
-          <td>${stage}</td>
-          <td>${s.date||""}</td>
-          <td>${s.shift||""}</td>
-          <td>${s.worker||""}</td>
-          <td>${s.foreman||""}</td>
-          <td class="${failC?"fail":"pass"}">${failC?"❌ ไม่ผ่าน "+failC+" รายการ":"✅ ผ่าน"}</td>
-          <td>${failNames}</td>
-          <td>${s.remark||""}</td>
-        </tr>`;
-      });
-    });
-    html += `</table>`;
-  });
-
-  html += `</body></html>`;
-  const w = window.open("","_blank");
-  w.document.write(html);
-  w.document.close();
-  setTimeout(()=>w.print(), 500);
-}
-
+// START
+syncFromSheets().then(()=>renderDashboard());
+resetCountdown();
 </script>
 </body>
 </html>
