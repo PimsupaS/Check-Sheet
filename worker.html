@@ -334,7 +334,7 @@ function renderGroups(){
     const stages=STAGES[nav.dept][g]||[];
     const el=document.createElement("div");
     el.className="nav-card";
-    el.innerHTML=`<div class="nav-icon">🏭</div><div class="nav-info"><div class="nav-title">${g}</div><div class="nav-sub">${stages.length} Station</div></div><div class="nav-arrow">›</div>`;
+    el.innerHTML=`<div class="nav-icon">🏭</div><div class="nav-info"><div class="nav-title">${g}</div><div class="nav-sub">${stages.length} Stage</div></div><div class="nav-arrow">›</div>`;
     el.onclick=()=>{ nav.group=g; updateHeader(); renderStages(); showPage("stage"); };
     grid.appendChild(el);
   });
