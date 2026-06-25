@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard — ISUZU Office</title>
+<title>Dashboard — ISUZU FRG Office</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&display=swap');
 :root{
@@ -109,7 +109,7 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 <!-- HEADER -->
 <div class="header">
   <div>
-    <div class="logo">ISUZU<span>Office Dashboard · Real-time</span></div>
+    <div class="logo">ISUZU FRG <span>Office Dashboard · Real-time</span></div>
     <div style="font-size:11px;opacity:.75;margin-top:4px;" id="headerDate"></div>
   </div>
   <div class="live-wrap">
@@ -232,21 +232,26 @@ async function syncFromSheets(){
     const data = await r.json();
     if(data.result==="success" && data.rows && data.rows.length>0){
       const entries = data.rows.map(row=>{
-        try{ return JSON.parse(row["JSON เต็ม"]||"{}"); }
-        catch(e){
-          return {
-            id:row["ID"]||"",
-            date:String(row["วันที่"]||"").split("T")[0],
-            shift:row["กะ"]||"", stage:row["Stage"]||"",
-            group:row["Group"]||"", dept:row["dept"]||"",
-            dept_name:row["แผนก"]||"", worker:row["Worker"]||"",
-            foreman:row["Foreman"]||"",
-            timestamp_worker:row["เวลา Worker"]||"",
-            timestamp_foreman:row["เวลา Foreman"]||"",
-            remark:row["หมายเหตุ"]||"",
-            status:row["สถานะ"]||"approved", checks:[]
-          };
-        }
+        let parsed = {};
+        try{ parsed = JSON.parse(row["JSON เต็ม"]||"{}"); }catch(e){ parsed = {}; }
+        // เติม dept/dept_id จากคอลัมน์โดยตรงเสมอ เผื่อ JSON เก่าไม่มี dept
+        const deptFromCol = row["dept_id"] || row["dept"] || "";
+        return {
+          id: parsed.id || row["ID"] || "",
+          date: parsed.date || String(row["วันที่"]||"").split("T")[0],
+          shift: parsed.shift || row["กะ"] || "",
+          stage: parsed.stage || row["Stage"] || "",
+          group: parsed.group || row["Group"] || "",
+          dept: parsed.dept || deptFromCol || "",
+          dept_name: parsed.dept_name || row["แผนก"] || "",
+          worker: parsed.worker || row["Worker"] || "",
+          foreman: parsed.foreman || row["Foreman"] || "",
+          timestamp_worker: parsed.timestamp_worker || row["เวลา Worker"] || "",
+          timestamp_foreman: parsed.timestamp_foreman || row["เวลา Foreman"] || "",
+          remark: parsed.remark || row["หมายเหตุ"] || "",
+          status: parsed.status || row["สถานะ"] || "approved",
+          checks: parsed.checks || []
+        };
       }).filter(e=>e&&e.id);
       allSubs = entries;
       localStorage.setItem("isuzu_submissions",JSON.stringify(entries));
@@ -290,8 +295,7 @@ function renderDashboard(){
 
         // find subs for this stage
         const stageSubs = subs.filter(s=>
-          s.stage===stage && s.group===grp &&
-          (s.dept===dept.id || s.dept_name===dept.name)
+          s.stage===stage && s.group===grp && s.dept===dept.id
         );
         const shiftA = stageSubs.find(s=>s.shift==="A");
         const shiftB = stageSubs.find(s=>s.shift==="B");
