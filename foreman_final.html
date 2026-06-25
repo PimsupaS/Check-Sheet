@@ -423,14 +423,19 @@ function renderStations(){
     byDept[s.deptId].stages.push(s.stage);
   });
 
-  Object.values(byDept).forEach(dept=>{
+  Object.entries(byDept).forEach(([deptId, dept])=>{
     const deptHeader = document.createElement("div");
     deptHeader.style.cssText = "font-size:12px;font-weight:700;color:var(--text);margin:14px 0 6px;display:flex;align-items:center;gap:6px;";
     deptHeader.innerHTML = `<span>${dept.icon}</span><span>${dept.name}</span>`;
     grid.appendChild(deptHeader);
 
     dept.stages.forEach(st=>{
-      const todaySubs = all.filter(s=>s.stage===st && s.shift===currentFM.shift && s.date===today);
+      const todaySubs = all.filter(s=>
+        s.stage===st &&
+        s.shift===currentFM.shift &&
+        String(s.date||"").split("T")[0]===today &&
+        s.dept===deptId
+      );
       const approved = todaySubs.filter(s=>s.status==="approved");
       const hasFail = approved.some(s=>(s.checks||[]).some(c=>c.result==="fail"));
       const isDone = approved.length>0;
