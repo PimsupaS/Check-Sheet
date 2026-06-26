@@ -9,7 +9,6 @@
 :root{--red:#CC0000;--red-dark:#A00000;--pass:#057A55;--pass-bg:#ECFDF5;--pass-border:#6EE7B7;--fail-bg:#FFF5F5;--fail-border:#FFBABA;--bg:#F5F5F5;--card:#fff;--text:#1A1A1A;--muted:#6B7280;--border:#E5E7EB;--shadow:0 2px 12px rgba(0,0,0,.08);}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px;}
-/* LOGIN */
 .login-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
 .login-box{background:var(--card);border-radius:20px;box-shadow:0 8px 32px rgba(0,0,0,.12);padding:32px 24px;width:100%;max-width:360px;text-align:center;}
 .login-logo{font-size:28px;font-weight:800;color:var(--red);letter-spacing:.06em;margin-bottom:4px;}
@@ -20,7 +19,6 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 .login-btn{width:100%;background:var(--red);color:#fff;border:none;border-radius:10px;padding:14px;font-family:'Sarabun',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:background .15s;}
 .login-btn:hover{background:var(--red-dark);}
 .login-err{color:var(--red);font-size:13px;margin-top:10px;min-height:20px;}
-/* HEADER */
 .header{background:var(--red);color:#fff;padding:18px 16px 30px;}
 .header-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
 .logo{font-size:18px;font-weight:800;letter-spacing:.06em;}
@@ -29,16 +27,13 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 .header-label{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;opacity:.65;margin-bottom:2px;}
 .header-name{font-size:20px;font-weight:800;}
 .header-sub{font-size:13px;opacity:.75;margin-top:2px;}
-/* TABS */
 .tabs{display:flex;background:var(--card);margin:0 14px;}
 .tab{flex:1;padding:11px 6px;text-align:center;font-size:13px;font-weight:700;cursor:pointer;border-bottom:3px solid transparent;color:var(--muted);transition:all .15s;user-select:none;}
 .tab:first-child{border-radius:12px 0 0 0;}.tab:last-child{border-radius:0 12px 0 0;}
 .tab.active{color:var(--red);border-bottom-color:var(--red);}
 .badge{display:inline-block;background:var(--red);color:#fff;border-radius:99px;font-size:10px;padding:1px 6px;margin-left:4px;vertical-align:middle;}
-/* SECTION */
 .section{margin:14px 14px 0;}
 .section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:8px;}
-/* CARDS */
 .sub-card{background:var(--card);border-radius:14px;border:1.5px solid var(--border);padding:14px;box-shadow:var(--shadow);margin-bottom:10px;}
 .sub-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
 .sub-title{font-size:15px;font-weight:700;}
@@ -61,18 +56,13 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 .approved-banner{background:var(--pass-bg);color:var(--pass);border-radius:8px;padding:9px 12px;font-size:13px;font-weight:600;text-align:center;margin-top:10px;}
 .empty-state{text-align:center;padding:48px 20px;color:var(--muted);}
 .empty-state .icon{font-size:40px;margin-bottom:10px;}
-/* STATION SUMMARY (tab 2) */
-.station-grid{display:flex;flex-direction:column;gap:8px;}
-.station-row{background:var(--card);border-radius:12px;border:1.5px solid var(--border);padding:12px 14px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px;}
+.type-group-header{font-size:12px;font-weight:700;color:var(--text);margin:14px 0 6px;display:flex;align-items:center;gap:6px;}
+.station-row{background:var(--card);border-radius:12px;border:1.5px solid var(--border);padding:12px 14px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px;margin-bottom:6px;}
 .station-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
-.dot-done{background:var(--pass);}
-.dot-issue{background:var(--red);}
-.dot-pending{background:#D1D5DB;}
+.dot-done{background:var(--pass);} .dot-issue{background:var(--red);} .dot-pending{background:#D1D5DB;}
 .station-name{font-size:14px;font-weight:600;flex:1;}
 .station-status{font-size:12px;font-weight:600;}
-/* page */
 .page{display:none;}.page.active{display:block;}
-/* toast */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#111827;color:#fff;border-radius:12px;padding:13px 20px;font-size:14px;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,.2);transition:transform .3s;z-index:999;text-align:center;min-width:260px;pointer-events:none;}
 .toast.show{transform:translateX(-50%) translateY(0);}
 .toast.ok{background:var(--pass);}.toast.err{background:var(--red);}
@@ -82,20 +72,18 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 </head>
 <body>
 
-<!-- LOGIN SCREEN -->
 <div id="loginScreen" class="login-wrap">
   <div class="login-box">
     <div class="login-logo">ISUZU</div>
-    <div class="login-sub">Foreman</div>
+    <div class="login-sub">Foreman Portal — FRG</div>
     <label class="login-label">รหัสพนักงาน Foreman</label>
-    <input class="login-input" id="codeInput" type="text" maxlength="5" placeholder="XXXXX" inputmode="numeric"
+    <input class="login-input" id="codeInput" type="text" maxlength="5" placeholder="12345" inputmode="numeric"
       onkeydown="if(event.key==='Enter')doLogin()">
     <button class="login-btn" onclick="doLogin()">เข้าสู่ระบบ</button>
     <div class="login-err" id="loginErr"></div>
   </div>
 </div>
 
-<!-- MAIN SCREEN -->
 <div id="mainScreen" style="display:none;">
   <div class="header">
     <div class="header-top">
@@ -116,19 +104,17 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
     </div>
   </div>
 
-  <!-- APPROVE TAB -->
   <div class="page active" id="page-approve">
     <div class="section">
-      <div class="section-title" id="approveTitle">รายการรอการอนุมัติ</div>
+      <div class="section-title" id="approveTitle">รายการรอการอนุมัติ (วันนี้)</div>
       <div id="approveList"></div>
     </div>
   </div>
 
-  <!-- STATIONS TAB -->
   <div class="page" id="page-stations">
     <div class="section">
-      <div class="section-title">สถานะ Station ที่ดูแล</div>
-      <div class="station-grid" id="stationGrid"></div>
+      <div class="section-title">สถานะ Station ที่ดูแล (วันนี้)</div>
+      <div id="stationGrid"></div>
     </div>
   </div>
 </div>
@@ -136,8 +122,10 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 <div class="toast" id="toast"></div>
 
 <script>
+const SHEETS_URL = "https://script.google.com/macros/s/AKfycbxFpwj3ZzsQK6CbbyiS-kyuiFPQd_3dNge_VE_7qgjxs5JsbaUN6eGjYkEXS7UfC6Mk/exec";
+
 // ============================================================
-// FOREMAN MASTER DATA (สมมติ — แก้ตามข้อมูลจริงได้)
+// FOREMAN MASTER DATA
 // ============================================================
 const FOREMAN_DB = {
   "25019": { name:"นาย สุพัฒน์ คำชนะ",      shift:"A", group:"FRC" },
@@ -158,62 +146,121 @@ const FOREMAN_DB = {
   "94037": { name:"นาย วิบูลย์ อาจหาญ",     shift:"B", group:"FXC" },
 };
 
+// ============================================================
+// STATION DATA (เหมือนกับ worker_v2.html)
+// ============================================================
+const STATION_DATA = {
+  FRC: {
+    CO2: { label:"เครื่องเชื่อม CO2", stages:{
+      "CP1-02": ["FRT-LH", "RR-LH", "FRT-RH", "RR-RH"],
+      "CP1-04": ["FRT-LH", "RR-LH", "FRT-RH", "RR-RH"],
+      "CP1-05": ["FRT-LH", "RR-LH", "FRT-RH", "RR-RH"],
+    }},
+    JIG: { label:"JIG", stages:{ "CP1-02": [], "CP1-03": [], "CP1-04": [], "CP1-05": [] }},
+    AIR: { label:"AIR SERVICE UNIT", stages:{ "CP1-02": [], "CP1-03": [], "CP1-04": [], "CP1-05": [] }},
+    FANUC: { label:"หุ่นยนต์ FANUC", stages:{
+      "CP1-03-LH": ["no.1", "no.3", "no.5"], "CP1-03-RH": ["no.2", "no.4", "no.6"],
+    }},
+    CONTACT_TIP: { label:"CONTACT TIP", stages:{ "CP1-03": [] }},
+  },
+  FRF: {
+    HOIST: { label:"ELECTRIC HOIST", stages:{ "SA1-01": [] }},
+    CO2: { label:"เครื่องเชื่อม CO2", stages:{ "SA1-02": [], "MA1-7.5": ["LH", "RH"], "MA1-09": ["LH", "RH"] }},
+    JIG: { label:"JIG", stages:{
+      "SA1-01": [], "SA1-02": [], "MA1-00": [], "MA1-02": [],
+      "MA1-04": [], "MA1-06": [], "MA1-07": [], "MA1-09": [],
+    }},
+    AIR: { label:"AIR SERVICE UNIT", stages:{
+      "SA1-01&02": [], "MA1-00&02": [], "MA1-03-05": [], "MA1-04": [],
+      "MA1-06": [], "MA1-07": [], "MA1-09": [],
+    }},
+    YASKAWA: { label:"หุ่นยนต์ YASKAWA", stages:{
+      "SA1-01": [], "SA1-02": [], "MA1-02": [],
+      "MA1-04": ["No.2/4/6", "No.1/3/5"], "MA1-06": [],
+    }},
+    CONTACT_TIP: { label:"CONTACT TIP", stages:{ "MA1-02": [], "MA1-04": [], "MA1-06": [], "SA1-01&02": [] }},
+  },
+  FRR: {
+    HOIST: { label:"ELECTRIC HOIST", stages:{ "SC1-01": [] }},
+    CO2: { label:"เครื่องเชื่อม CO2", stages:{ "MC1-8.5": ["LH", "RH"], "MC1-10": ["LH", "RH"] }},
+    JIG: { label:"JIG", stages:{
+      "SC1-01": [], "SC1-02": [], "MC1-01": [], "MC1-02": [],
+      "MC1-04": [], "MC1-05": [], "MC1-07": [], "MC1-08": [], "MC1-10": [],
+    }},
+    AIR: { label:"AIR SERVICE UNIT", stages:{
+      "SC1-01": [], "SC1-02": [], "MC1-01,02": [], "MC1-04": [],
+      "MC1-05": [], "MC1-07,08": [], "MC1-8.5": ["H8", "H7"], "MC1-10": ["H9", "H10", "Jig", "Lifter"],
+    }},
+    YASKAWA: { label:"หุ่นยนต์ YASKAWA", stages:{
+      "SC1-01": [], "SC1-02": [], "MC1-02": [],
+      "MC1-04": ["No.2/4/6"], "MC1-05": ["No.1/3/5"], "MC1-07": [],
+    }},
+    CONTACT_TIP: { label:"CONTACT TIP", stages:{
+      "SC1-01": [], "SC1-02": [], "MC1-02": [], "MC1-04": [], "MC1-05": [], "MC1-07": [],
+    }},
+  },
+  FRU: {
+    HOIST: { label:"ELECTRIC HOIST", stages:{ "SA2-01": [] }},
+    CO2: { label:"เครื่องเชื่อม CO2", stages:{ "MA2-07": ["LH", "RH"], "MA2-09": ["LH", "RH"] }},
+    JIG: { label:"JIG", stages:{
+      "SA2-01": [], "SA2-02": [], "MA2-01": [], "MA2-02": [], "MA2-04": [], "MA2-06": [], "MA2-09": [],
+    }},
+    AIR: { label:"AIR SERVICE UNIT", stages:{
+      "SA2-01&02": [], "MA2-01&02": [], "MA2-04": [], "MA2-06": [], "MA2-09": ["H8", "H9"],
+    }},
+    FANUC: { label:"หุ่นยนต์ FANUC", stages:{ "SA2-01,02": [], "MA2-02": [], "MA2-04": [], "MA2-06": [] }},
+    CONTACT_TIP: { label:"CONTACT TIP", stages:{ "MA2-02": [], "MA2-04": [], "MA2-06": [], "SA2-01&02": [] }},
+  },
+  FRX: {
+    HOIST: { label:"ELECTRIC HOIST", stages:{ "SC2-01": [] }},
+    CO2: { label:"เครื่องเชื่อม CO2", stages:{ "SC2-02": [], "MC2-08": ["LH", "RH"], "MC2-10": ["LH", "RH"] }},
+    JIG: { label:"JIG", stages:{
+      "SC2-01": ["RG2u-RJ2u"], "SC2-02": ["RG2u-RJ2u"],
+      "MC2-01": [], "MC2-02": [], "MC2-04": [], "MC2-05": [], "MC2-07": [], "MC2-10": [],
+    }},
+    AIR: { label:"AIR SERVICE UNIT", stages:{
+      "SC2-01": [], "SC2-02": [], "MC2-01,02": [], "MC2-04,05": [], "MC2-07": [],
+      "MC2-10": ["H8", "H9", "H10", "Jig"],
+    }},
+    FANUC: { label:"หุ่นยนต์ FANUC", stages:{
+      "SC2-01": [], "SC2-02": [], "MC2-02": [], "MC2-04": [], "MC2-05": [], "MC2-07": [],
+    }},
+    CONTACT_TIP: { label:"CONTACT TIP", stages:{
+      "MC2-02": [], "MC2-04": [], "MC2-05": [], "MC2-07": [], "SC2-01&02": [],
+    }},
+  },
+  FXC: {
+    CO2: { label:"เครื่องเชื่อม CO2", stages:{
+      "CP2-02": ["007", "008", "009", "010"], "CP2-04": ["011", "012", "013", "014"], "CP2-05": ["015", "016", "017", "018"],
+    }},
+    JIG: { label:"JIG", stages:{ "CP2-02": [], "CP2-03": [], "CP2-04": [], "CP2-05": [] }},
+    AIR: { label:"AIR SERVICE UNIT", stages:{ "CP2-02": [], "CP2-03": [], "CP2-04": [], "CP2-05": [] }},
+    FANUC: { label:"หุ่นยนต์ FANUC", stages:{ "CP2-03": ["NO.1", "NO.3", "NO.5", "NO.2", "NO.4", "NO.6"] }},
+    CONTACT_TIP: { label:"CONTACT TIP", stages:{ "CP2-03": [] }},
+  },
+};
 
-// แผนก/Stage ทั้งหมด (สำหรับแสดง "Station ของฉัน" ตาม Group)
-const ALL_DEPTS = [
-  { id:"jig", name:"Jig", icon:"🔧", groups:{
-    FRF:["SA1-01 4x4 LH","SA1-01 4x4 RH","SA1-01 4x2 LH","SA1-01 4x2 RH","SA1-02 LH","SA1-02 RH","MA1-00","MA1-02","MA1-03","MA1-04","MA1-05","MA1-06","MA1-07","MA1-08","MA1-09"],
-    FRR:["SC1-01 LH","SC1-01 RH","SC1-02 LH","SC1-02 RH","MC1-0.5","MC1-01","MC1-02","MC1-03","MC1-04","MC1-05","MC1-06","MC1-07","MC1-08","MC1-09","MC1-10"],
-    FRC:["CP1-02","CP1-03","CP1-04","CP1-05"],
-    FRU:["SA2-01 4x4 LH","SA2-01 4x4 RH","SA2-01 4x2 LH","SA2-01 4x2 RH","SA2-02 LH","SA2-02 RH","MA2-01","MA2-02","MA2-03","MA2-04","MA2-05","MA2-06","MA2-07","MA2-08","MA2-09"],
-    FRX:["SC2-01 RG LH","SC2-01 RG RH","SC2-02 LH","SC2-02 RH","MC2-01","MC2-02","MC2-03","MC2-04","MC2-05","MC2-06","MC2-07","MC2-08","MC2-09","MC2-10"],
-    FXC:["CP2-02","CP2-03","CP2-04","CP2-05"],
-  }},
-  { id:"robot", name:"Robot", icon:"🤖", groups:{
-    FRF:["SA1-01","SA1-02","MA1-02","MA1-04","MA1-06","SA1-01&02"],
-    FRR:["SC1-01","SC1-02","MC1-02","MC1-04","MC1-05","MC1-07"],
-    FRC:["CP1-03-LH","CP1-03-RH","CP1-03"],
-    FRU:["SC1-01","SC1-02","MC1-02","MC1-04","MC1-05","MC1-07"],
-    FRX:["SC2-01","SC2-02","MC2-02","MC2-04","MC2-05","MC2-07","SC2-01&02"],
-    FXC:["CP2-03-W1","CP2-03-W2","CP2-03-W3","CP2-03-W4","CP2-03-W5","CP2-03-W6"],
-  }},
-  { id:"hoist", name:"Hoist", icon:"⚙️", groups:{
-    FRF:["SA1-01","MA1-00"], FRR:["SC1-01"], FRU:["SA2-01","MA2-01"], FRX:["SC2-01","MC2-01"],
-  }},
-  { id:"air", name:"Air Service Unit", icon:"💨", groups:{
-    FRF:["SA1-01&02","MA1-00&02","MA1-03-05","MA1-04","MA1-06","MA1-07","MA1-09"],
-    FRR:["FRL-SC1-01","FRL-SC1-02","FRL-SC1-03","FRL-MC1-01","FRL-MC1-02","FRL-MC1-03","FRL-MC1-04","FRL-MC1-05","FRL-MC1-06","FRL-MC1-07","FRL-MC1-08","FRL-MC1-09","FRL-MC1-10","FRL-MC1-11","FRL-MC1-12","FRL-MC1-13","FRL-MC1-14","FRL-MC1-15","FRL-MC1-16","FRL-MC1-17","FRL-MC1-18"],
-    FRC:["CP1-02","CP1-03","CP1-04","CP1-05"],
-    FRU:["MA2-04","MA2-06","MA2-09-H8","MA2-09-H9"],
-    FRX:["SC2-01","SC2-02","MC2-01","MC2-02","MC2-04","MC2-05","MC2-07","MC2-10-H8","MC2-10-H9","MC2-10-H10","MC2-10-JIG1"],
-    FXC:["CP2-02","CP2-03","CP2-04","CP2-05"],
-  }},
-  { id:"co2", name:"ตู้เชื่อม CO2", icon:"🔥", groups:{
-    FRF:["SA1-02","MA1-7.5 LH","MA1-7.5 RH","MA1-09 LH","MA1-09 RH"],
-    FRC:["CP1-02","CP1-04","CP1-05"],
-    FRR:["SC1-02","MC1-8.5 LH","MC1-8.5 RH","MC1-10 LH","MC1-10 RH"],
-    FRU:["MA2-07 LH","MA2-07 RH","MA2-09 LH","MA2-09 RH"],
-    FRX:["SC2-02","MC2-08 LH","MC2-08 RH","MC2-10 LH","MC2-10 RH"],
-    FXC:["CP2-02-07","CP2-02-08","CP2-02-09","CP2-02-10","CP2-04-11","CP2-04-12","CP2-04-13","CP2-04-14","CP2-05-15","CP2-05-16","CP2-05-17","CP2-05-18"],
-  }},
-  { id:"magnet", name:"Hoist แม่เหล็ก", icon:"🧲", groups:{
-    FRR:["MC1-0.5"],
-  }},
-];
+const TYPE_ICONS = { HOIST:"⚙️", CO2:"🔥", JIG:"🔧", AIR:"💨", FANUC:"🤖", YASKAWA:"🤖", CONTACT_TIP:"🔌" };
 
-// คืนรายการ {dept, stage} ทั้งหมดที่อยู่ใน group ที่กำหนด
-function getStagesForGroup(group){
+let currentFM = null;
+
+// คืนรายการ "ชื่อ Stage เต็ม" (รวม subtype) ทั้งหมดของ group ที่กำหนด พร้อมจัดกลุ่มตามประเภท
+function getAllStagesForGroup(group){
+  const types = STATION_DATA[group] || {};
   const result = [];
-  ALL_DEPTS.forEach(d=>{
-    const stages = d.groups[group];
-    if(stages){
-      stages.forEach(st=> result.push({ deptId:d.id, deptName:d.name, deptIcon:d.icon, stage:st }));
-    }
+  Object.entries(types).forEach(([typeKey, typeData])=>{
+    Object.entries(typeData.stages).forEach(([stageName, subtypes])=>{
+      if(subtypes.length){
+        subtypes.forEach(sub=>{
+          result.push({ type:typeKey, typeLabel:typeData.label, stage: stageName+"-"+sub, baseStage: stageName });
+        });
+      } else {
+        result.push({ type:typeKey, typeLabel:typeData.label, stage: stageName, baseStage: stageName });
+      }
+    });
   });
   return result;
 }
-
-let currentFM = null;
 
 function doLogin(){
   const code = document.getElementById("codeInput").value.trim();
@@ -225,7 +272,7 @@ function doLogin(){
   document.getElementById("mainScreen").style.display="block";
   document.getElementById("userPill").textContent = code+" ▾";
   document.getElementById("fmName").textContent = fm.name;
-  const stageCount = getStagesForGroup(fm.group).length;
+  const stageCount = getAllStagesForGroup(fm.group).length;
   document.getElementById("fmStations").textContent = "SHIFT "+fm.shift+" · Group "+fm.group+" · "+stageCount+" Station";
   renderApprove();
   updateBadge();
@@ -247,8 +294,6 @@ function switchTab(t){
   if(t==="approve") renderApprove();
 }
 
-const SHEETS_URL = "https://script.google.com/macros/s/AKfycbxFpwj3ZzsQK6CbbyiS-kyuiFPQd_3dNge_VE_7qgjxs5JsbaUN6eGjYkEXS7UfC6Mk/exec";
-
 function getSubs(){
   return JSON.parse(localStorage.getItem("isuzu_submissions")||"[]");
 }
@@ -261,9 +306,8 @@ async function syncFromSheets(){
     const r = await fetch(SHEETS_URL+"?t="+Date.now());
     const data = await r.json();
     if(data.result==="success" && data.rows && data.rows.length>0){
-      const rows = data.rows.filter(r=>r["JSON เต็ม"]);
-      const entries = rows.map(r=>{
-        try{ return JSON.parse(r["JSON เต็ม"]); }catch(e){return null;}
+      const entries = data.rows.map(row=>{
+        try{ return JSON.parse(row["JSON เต็ม"]); }catch(e){return null;}
       }).filter(Boolean);
       if(entries.length>0){
         localStorage.setItem("isuzu_submissions",JSON.stringify(entries));
@@ -307,7 +351,6 @@ function updateBadge(){
 // ===== RENDER APPROVE =====
 function renderApprove(){
   if(!currentFM) return;
-  // sync from sheets first
   syncFromSheets().then(()=>{
     _renderApprove();
     updateBadge();
@@ -340,8 +383,8 @@ function _renderApprove(){
 }
 
 function buildApproveCard(s, isDone){
-  const fails = s.checks.filter(c=>c.result==="fail");
-  const passC = s.checks.filter(c=>c.result==="pass").length;
+  const fails = (s.checks||[]).filter(c=>c.result==="fail");
+  const passC = (s.checks||[]).filter(c=>c.result==="pass").length;
   const card = document.createElement("div");
   card.className="sub-card";
   const t = new Date(s.timestamp_worker).toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"});
@@ -351,13 +394,13 @@ function buildApproveCard(s, isDone){
   card.innerHTML=`
     <div class="sub-header">
       <div>
-        <div class="sub-title">Stage ${s.stage} — SHIFT ${s.shift}</div>
-        <div class="sub-meta">${s.date} · ส่งเมื่อ ${t} · Worker: ${s.worker}</div>
+        <div class="sub-title">${s.type_label||s.type||""} — ${s.stage}</div>
+        <div class="sub-meta">SHIFT ${s.shift} · ${s.date} · ส่งเมื่อ ${t} · Worker: ${s.worker}</div>
       </div>${chip}
     </div>
-    ${s.checks.map(c=>`
+    ${(s.checks||[]).map(c=>`
       <div class="check-row">
-        <div class="check-row-name">${c.name.replace(/\n/g," ")}${c.comment?`<br><span style="font-size:11px;color:var(--muted);">↳ ${c.comment}</span>`:""}</div>
+        <div class="check-row-name">${c.name}${c.comment?`<br><span style="font-size:11px;color:var(--muted);">↳ ${c.comment}</span>`:""}</div>
         <span class="rtag ${c.result==="pass"?"rtag-pass":"rtag-fail"}">${c.result==="pass"?"O":"✗"}</span>
       </div>`).join("")}
     ${s.remark?`<div style="margin-top:8px;font-size:12px;color:var(--muted);">📝 ${s.remark}</div>`:""}
@@ -387,18 +430,14 @@ function approve(id){
   all[idx].status = "approved";
   saveSubs(all);
 
-  // ส่ง Google Sheets (เปิดเมื่อมี URL)
-  const SHEETS_URL = "https://script.google.com/macros/s/AKfycbxFpwj3ZzsQK6CbbyiS-kyuiFPQd_3dNge_VE_7qgjxs5JsbaUN6eGjYkEXS7UfC6Mk/exec";
-  // ส่งไป Sheets ผ่าน Image trick
   try{
     const encoded = encodeURIComponent(JSON.stringify(all[idx]));
     const img = new Image();
     img.src = SHEETS_URL + "?payload=" + encoded;
-    console.log("Foreman: ส่งข้อมูลแล้ว");
   }catch(e){ console.log("Foreman send error:",e); }
 
   updateBadge();
-  renderApprove();
+  _renderApprove();
   showToast("✓ อนุมัติและส่ง Office สำเร็จ!","ok");
 }
 
@@ -407,34 +446,33 @@ function renderStations(){
   if(!currentFM) return;
   const grid = document.getElementById("stationGrid");
   const all = getSubs();
-  const today = new Date().toISOString().split("T")[0];
+  const today = getToday();
   grid.innerHTML="";
 
-  const stages = getStagesForGroup(currentFM.group);
+  const stages = getAllStagesForGroup(currentFM.group);
   if(!stages.length){
     grid.innerHTML = `<div class="empty-state"><div class="icon">📭</div><p>ไม่พบ Station ใน Group นี้</p></div>`;
     return;
   }
 
-  // จัดกลุ่มตามแผนก
-  const byDept = {};
+  // จัดกลุ่มตามประเภท
+  const byType = {};
   stages.forEach(s=>{
-    if(!byDept[s.deptId]) byDept[s.deptId] = { name:s.deptName, icon:s.deptIcon, stages:[] };
-    byDept[s.deptId].stages.push(s.stage);
+    if(!byType[s.type]) byType[s.type] = { label:s.typeLabel, stages:[] };
+    byType[s.type].stages.push(s.stage);
   });
 
-  Object.entries(byDept).forEach(([deptId, dept])=>{
-    const deptHeader = document.createElement("div");
-    deptHeader.style.cssText = "font-size:12px;font-weight:700;color:var(--text);margin:14px 0 6px;display:flex;align-items:center;gap:6px;";
-    deptHeader.innerHTML = `<span>${dept.icon}</span><span>${dept.name}</span>`;
-    grid.appendChild(deptHeader);
+  Object.entries(byType).forEach(([typeKey, typeInfo])=>{
+    const header = document.createElement("div");
+    header.className = "type-group-header";
+    header.innerHTML = `<span>${TYPE_ICONS[typeKey]||"📋"}</span><span>${typeInfo.label}</span>`;
+    grid.appendChild(header);
 
-    dept.stages.forEach(st=>{
+    typeInfo.stages.forEach(st=>{
       const todaySubs = all.filter(s=>
-        s.stage===st &&
+        s.stage===st && s.group===currentFM.group &&
         s.shift===currentFM.shift &&
-        String(s.date||"").split("T")[0]===today &&
-        s.dept===deptId
+        String(s.date||"").split("T")[0]===today
       );
       const approved = todaySubs.filter(s=>s.status==="approved");
       const hasFail = approved.some(s=>(s.checks||[]).some(c=>c.result==="fail"));
@@ -460,7 +498,6 @@ function showToast(msg,type=""){
   setTimeout(()=>t.className="toast",3000);
 }
 
-// auto-refresh pending ทุก 30 วิ
 setInterval(()=>{if(currentFM){updateBadge();}},30000);
 </script>
 </body>
