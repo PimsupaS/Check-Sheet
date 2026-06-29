@@ -501,7 +501,7 @@ function renderChecks(){
       <div class="comment-row" style="display:flex;align-items:center;gap:8px;margin-top:8px;margin-bottom:0;">
         <input type="number" inputmode="decimal" placeholder="ค่าที่วัดได้ (${c.min}-${c.max})"
           style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-family:'Sarabun',sans-serif;font-size:14px;outline:none;"
-          value="${s.value||""}" oninput="setV(${c.id},this.value)">
+          value="${s.value||""}" oninput="setVQuiet(${c.id},this.value)" onblur="setV(${c.id},this.value)">
         <span style="font-size:13px;color:var(--muted);min-width:40px;">${c.unit||""}</span>
       </div>` : "";
 
@@ -535,6 +535,14 @@ function renderChecks(){
 
 function setR(id,v){checkState[id].result=checkState[id].result===v?null:v;if(checkState[id].result!=="fail")checkState[id].comment="";renderChecks();}
 function setC(id,v){checkState[id].comment=v;}
+let _vDebounceTimers = {};
+function setVQuiet(id,v){
+  // เก็บค่าทันที (ไม่ re-render) แล้วรอ debounce ก่อนตัดสิน pass/fail
+  checkState[id].value = v;
+  clearTimeout(_vDebounceTimers[id]);
+  _vDebounceTimers[id] = setTimeout(()=>{ setV(id, v); }, 600);
+}
+
 function setV(id,v){
   checkState[id].value=v;
   const c = currentChecks.find(x=>x.id===id);
