@@ -306,11 +306,30 @@ const TYPE_ICONS = {
   FANUC: "🤖", YASKAWA: "🤖", CONTACT_TIP: "🔌",
 };
 
-// รายการตรวจพื้นฐาน (ใช้กับทุก Stage)
+// รายการตรวจพื้นฐาน (ใช้กับประเภทที่ยังไม่มีรายการเฉพาะ)
 const DEFAULT_CHECKS = [
   {id:1,name:"พื้นที่รอบๆ บริเวณ",  method:"สายตา", standard:"ไม่มีสิ่งของที่ไม่จำเป็นวางอยู่"},
   {id:2,name:"สภาพทั่วไป",           method:"สายตา, สัมผัส", standard:"อยู่ในสภาพดี ไม่มีความผิดปกติ"},
 ];
+
+// รายการตรวจเฉพาะของเครื่องเชื่อม CO2 (ใช้กับทุก Stage ทุก Group ที่เป็นประเภท CO2)
+const CO2_CHECKS = [
+  {id:1, name:"จุดต่อสายไฟเข้าและออกจากเครื่อง", method:"สัมผัส, สายตา", standard:"ไม่หลวม, ไม่แตกร้าว"},
+  {id:2, name:"การทำงานของเครื่อง",               method:"ประสาทสัมผัส", standard:"ไม่สั่น, ไม่มีเสียงหรือกลิ่น"},
+  {id:3, name:"พัดลมระบายความร้อน",               method:"ประสาทสัมผัส", standard:"ทำงานปกติ"},
+  {id:4, name:"โรลเลอร์, ลวดเชื่อม, ยี่ห้อลวดเชื่อม", method:"สายตา", standard:"ไม่เป็นสนิม LINE 1&4 KOBE, LINE 2 NIPPON"},
+  {id:5, name:"แรงกดลวดหน้า",                     method:"สายตา", standard:"แนะนำ แรงกดลวด 2-4"},
+  {id:6, name:"แรงกดลวดหลัง",                     method:"สายตา", standard:"แนะนำ แรงกดลวด 2-4"},
+  {id:7, name:"คอนแทคทิป, นอสเซิล",               method:"สายตา", standard:"ไม่มี Spatter ติด, ไม่แตกร้าว"},
+  {id:8, name:"กระแสไฟเชื่อม",                    method:"ปรับที่หน้าตู้", standard:"200-250 Amp", numeric:true, unit:"Amp", min:200, max:250},
+  {id:9, name:"แรงดันไฟฟ้า",                      method:"ปรับที่หน้าตู้", standard:"20-26 Volt", numeric:true, unit:"Volt", min:20, max:26},
+  {id:10,name:"อัตราการไหลแก๊ส CO2",             method:"สายตา", standard:"26-30 Lite/minute", numeric:true, unit:"L/min", min:26, max:30},
+];
+
+// แมประหว่างประเภทหลัก -> รายการตรวจที่ใช้
+const CHECKS_BY_TYPE = {
+  CO2: CO2_CHECKS,
+};
 
 // ============================================================
 // STATE
@@ -463,9 +482,9 @@ function renderSubtypes(){
 // FORM
 // ============================================================
 function initForm(){
-  currentChecks = DEFAULT_CHECKS;
+  currentChecks = CHECKS_BY_TYPE[nav.type] || DEFAULT_CHECKS;
   checkState={};
-  currentChecks.forEach(c=>{ checkState[c.id]={result:null,comment:""}; });
+  currentChecks.forEach(c=>{ checkState[c.id]={result:null,comment:"",value:""}; });
   renderChecks();
 }
 
@@ -476,6 +495,26 @@ function renderChecks(){
     const s=checkState[c.id];
     const div=document.createElement("div");
     div.className="check-item"+(s.result==="pass"?" pass":s.result==="fail"?" fail":"");
+
+    const numericRow = c.numeric ? `
+      <div class="comment-row" style="display:flex;align-items:center;gap:8px;margin-top:8px;margin-bottom:0;">
+        <input type="number" inputmode="decimal" placeholder="ค่าที่วัดได้ (${c.min}-${c.max})"
+          style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-family:'Sarabun',sans-serif;font-size:14px;outline:none;"
+          value="${s.value||""}" oninput="setV(${c.id},this.value)">
+        <span style="font-size:13px;color:var(--muted);min-width:40px;">${c.unit||""}</span>
+      </div>` : "";
+
+    const toggleOrStatus = c.numeric
+      ? `<div style="flex-shrink:0;margin-top:2px;">
+           ${s.result==="pass"?'<span style="font-size:11px;font-weight:700;color:var(--pass);background:var(--pass-bg);border-radius:6px;padding:4px 10px;">✓ ผ่าน</span>'
+             :s.result==="fail"?'<span style="font-size:11px;font-weight:700;color:var(--red);background:var(--fail-bg);border-radius:6px;padding:4px 10px;">✗ ไม่ผ่าน</span>'
+             :'<span style="font-size:11px;color:var(--muted);">รอกรอกค่า</span>'}
+         </div>`
+      : `<div class="toggle-group">
+           <button class="tbtn ${s.result==="pass"?"ap":""}" onclick="setR(${c.id},'pass')">O</button>
+           <button class="tbtn ${s.result==="fail"?"af":""}" onclick="setR(${c.id},'fail')">✗</button>
+         </div>`;
+
     div.innerHTML=`
       <div class="check-top">
         <span class="check-num">${c.id}</span>
@@ -483,11 +522,9 @@ function renderChecks(){
           <div class="check-name">${c.name}</div>
           <div class="check-std">${c.standard}</div>
         </div>
-        <div class="toggle-group">
-          <button class="tbtn ${s.result==="pass"?"ap":""}" onclick="setR(${c.id},'pass')">O</button>
-          <button class="tbtn ${s.result==="fail"?"af":""}" onclick="setR(${c.id},'fail')">✗</button>
-        </div>
+        ${toggleOrStatus}
       </div>
+      ${numericRow}
       ${s.result==="fail"?`<div class="comment-row"><textarea placeholder="ระบุสิ่งที่พบ / แจ้งหัวหน้าแล้วหรือยัง..." oninput="setC(${c.id},this.value)">${s.comment}</textarea></div>`:""}
     `;
     list.appendChild(div);
@@ -497,6 +534,20 @@ function renderChecks(){
 
 function setR(id,v){checkState[id].result=checkState[id].result===v?null:v;if(checkState[id].result!=="fail")checkState[id].comment="";renderChecks();}
 function setC(id,v){checkState[id].comment=v;}
+function setV(id,v){
+  checkState[id].value=v;
+  const c = currentChecks.find(x=>x.id===id);
+  if(c && c.numeric && v!==""){
+    const num = parseFloat(v);
+    if(!isNaN(num)){
+      checkState[id].result = (num>=c.min && num<=c.max) ? "pass" : "fail";
+      if(checkState[id].result!=="fail") checkState[id].comment="";
+      renderChecks();
+      return;
+    }
+  }
+  updateProgress();
+}
 
 function updateProgress(){
   const total=currentChecks.length;
@@ -535,7 +586,7 @@ function submitWorker(){
     stage:fullStage, stage_base:nav.stage, subtype:nav.subtype,
     worker, foreman:null,
     remark:document.getElementById("remarkText").value.trim(),
-    checks:currentChecks.map(c=>({id:c.id,name:c.name,result:checkState[c.id].result,comment:checkState[c.id].comment})),
+    checks:currentChecks.map(c=>({id:c.id,name:c.name,result:checkState[c.id].result,comment:checkState[c.id].comment,value:checkState[c.id].value||""})),
     status:"pending"
   };
 
