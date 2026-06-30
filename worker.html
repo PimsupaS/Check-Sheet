@@ -346,12 +346,23 @@ const FANUC_CHECKS = [
   {id:6, name:"น้ำยาล้างหัว ROBOT",                   method:"สายตา",          standard:"ไม่แห้ง หรือ หมดจากภาชนะ"},
 ];
 
+// รายการตรวจเฉพาะของ AIR SERVICE UNIT
+const AIR_CHECKS = [
+  {id:1, name:"AIR FILTER (ตัวกรอง)",                          method:"สายตา",              standard:"ไม่มีน้ำหรือเศษผงอยู่ในถ้วยดักน้ำ"},
+  {id:2, name:"AIR PRESSURE (ค่าแรงดันลม)",                    method:"สายตา",              standard:"0.45-0.55 Mpa", numeric:true, unit:"Mpa", min:0.45, max:0.55},
+  {id:3, name:"น้ำมันหล่อลื่น (ตรวจเฉพาะแบบเก่า)",           method:"สายตา",              standard:"อยู่ในขีดบน-ล่าง และไม่มีน้ำมันรั่ว"},
+  {id:4, name:"หน้าปัดแรงดันลม",                               method:"สายตา",              standard:"มีฝาครอบ, มีขีดบอกค่า MAX-MIN"},
+  {id:5, name:"ลมรั่ว",                                         method:"ฟังเสียง, สัมผัส",  standard:"ไม่มีลมรั่ว"},
+  {id:6, name:"สายไฟส่งสัญญาณเช็คค่าแรงดันลม",               method:"สายตา, สัมผัส",      standard:"ไม่ถลอก, ไม่แตกชำรุด"},
+];
+
 // แมประหว่างประเภทหลัก -> รายการตรวจที่ใช้
 const CHECKS_BY_TYPE = {
   CO2: CO2_CHECKS,
   JIG: JIG_CHECKS,
   FANUC: FANUC_CHECKS,
-  YASKAWA: FANUC_CHECKS,  // รายการตรวจเหมือน FANUC ทุกข้อ
+  YASKAWA: FANUC_CHECKS,
+  AIR: AIR_CHECKS,
 };
 
 // ============================================================
