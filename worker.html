@@ -356,6 +356,17 @@ const AIR_CHECKS = [
   {id:6, name:"สายไฟส่งสัญญาณเช็คค่าแรงดันลม",               method:"สายตา, สัมผัส",      standard:"ไม่ถลอก, ไม่แตกชำรุด"},
 ];
 
+// รายการตรวจเฉพาะของ ELECTRIC HOIST
+const HOIST_CHECKS = [
+  {id:1, name:"สภาพปุ่มกด, สายไฟ",                                        method:"สายตา",        standard:"ไม่ชำรุด, ปุ่มไม่แตก"},
+  {id:2, name:"สภาพตะขอ",                                                  method:"สายตา",        standard:"ไม่มีรอยแตกร้าว, HOOK LATCH ใช้งานได้"},
+  {id:3, name:"SAFETY สลิง (1),(2)&(3) สลิงพยุงสายรีโมท",                 method:"สายตา",        standard:"มี SAFETY สลิง, สภาพสลิงต้องไม่แตก และไม่มีเส้นสลิงแหลมยื่นออกมา"},
+  {id:4, name:"สภาพ HANGER",                                               method:"สายตา",        standard:"ไม่สึกหรอ, ไม่มีรอยแตกร้าว"},
+  {id:5, name:"การเคลื่อนที่ของ HOIST",                                   method:"เลื่อนซ้าย-ขวา", standard:"ไม่สะดุด"},
+  {id:6, name:"การขึ้นลงของโซ่",                                           method:"กดปุ่มขึ้น-ลง", standard:"วิ่งขึ้น-ลงราบเรียบ, หยุดตามตำแหน่ง"},
+  {id:7, name:"Spring balancer",                                            method:"ดึงขึ้น-ลง",    standard:"วิ่งขึ้น-ลงราบเรียบ"},
+];
+
 // แมประหว่างประเภทหลัก -> รายการตรวจที่ใช้
 const CHECKS_BY_TYPE = {
   CO2: CO2_CHECKS,
@@ -363,6 +374,7 @@ const CHECKS_BY_TYPE = {
   FANUC: FANUC_CHECKS,
   YASKAWA: FANUC_CHECKS,
   AIR: AIR_CHECKS,
+  HOIST: HOIST_CHECKS,
 };
 
 // ============================================================
