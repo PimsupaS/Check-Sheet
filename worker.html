@@ -336,10 +336,21 @@ const JIG_CHECKS = [
   {id:6, name:"สภาพสายลม, กระบอกลม",                  method:"สายตา, ฟังเสียง",      standard:"ไม่แตก, ไม่มีเสียงลมรั่ว"},
 ];
 
+// รายการตรวจเฉพาะของหุ่นยนต์ FANUC
+const FANUC_CHECKS = [
+  {id:1, name:"สภาพทั่วไปหัว TORCH",                  method:"สายตา, สัมผัส",  standard:"ไม่โยก, ไม่หลวมคลอน"},
+  {id:2, name:"คอนแทคทิป, นอสเซิล, ทิปบอดี้",        method:"สายตา",          standard:"ไม่มี Spatter ติด, ไม่แตกร้าว"},
+  {id:3, name:"TEACH PENDANT",                          method:"สายตา",          standard:"สวิทช์อยู่โหมด AUTO, SPEED RATIO 100%"},
+  {id:4, name:"แรงกดลวด",                              method:"สายตา",          standard:"แรงกดลวดอยู่ที่ค่า 2-4"},
+  {id:5, name:"อัตราการไหลแก๊ส",                      method:"สายตา",          standard:"26-30 Lite/minute", numeric:true, unit:"L/min", min:26, max:30},
+  {id:6, name:"น้ำยาล้างหัว ROBOT",                   method:"สายตา",          standard:"ไม่แห้ง หรือ หมดจากภาชนะ"},
+];
+
 // แมประหว่างประเภทหลัก -> รายการตรวจที่ใช้
 const CHECKS_BY_TYPE = {
   CO2: CO2_CHECKS,
   JIG: JIG_CHECKS,
+  FANUC: FANUC_CHECKS,
 };
 
 // ============================================================
