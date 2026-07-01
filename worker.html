@@ -77,6 +77,11 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#111827;color:#fff;border-radius:12px;padding:13px 20px;font-size:14px;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,.2);transition:transform .3s;z-index:999;text-align:center;min-width:260px;pointer-events:none;}
 .toast.show{transform:translateX(-50%) translateY(0);}
 .toast.ok{background:var(--pass);}.toast.err{background:var(--red);}
+.ct-row{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:12px;border:1.5px solid var(--border);padding:12px 14px;box-shadow:var(--shadow);}
+.ct-label{flex:1;font-size:15px;font-weight:700;}
+.ct-btn{padding:10px 16px;border-radius:10px;border:1.5px solid var(--border);background:#F9FAFB;font-family:'Sarabun',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.ct-btn.changed{background:var(--pass);border-color:var(--pass);color:#fff;}
+.ct-btn.unchanged{background:var(--red);border-color:var(--red);color:#fff;}
 .page{display:none;}.page.active{display:block;}
 </style>
 </head>
@@ -197,7 +202,7 @@ const STATION_DATA = {
       "CP1-03-LH": ["no.1", "no.3", "no.5"],
       "CP1-03-RH": ["no.2", "no.4", "no.6"],
     }},
-    CONTACT_TIP: { label:"CONTACT TIP", stages:{ "CP1-03": [] }},
+    CONTACT_TIP: { label:"CONTACT TIP", stages:{ "CP1-03": ["W1","W2","W3","W4","W5","W6"] }},
   },
   FRF: {
     HOIST: { label:"ELECTRIC HOIST", stages:{ "SA1-01": [] }},
@@ -217,7 +222,7 @@ const STATION_DATA = {
       "MA1-04": ["No.2/4/6", "No.1/3/5"], "MA1-06": [],
     }},
     CONTACT_TIP: { label:"CONTACT TIP", stages:{
-      "MA1-02": [], "MA1-04": [], "MA1-06": [], "SA1-01&02": [],
+      "MA1-02": ["W1","W2","W3","W4"], "MA1-04": ["W1","W2","W3","W4","W5","W6"], "MA1-06": ["W1","W2","W3","W4"], "SA1-01&02": ["W1","W2"],
     }},
   },
   FRR: {
@@ -239,7 +244,7 @@ const STATION_DATA = {
       "MC1-04": ["No.2/4/6"], "MC1-05": ["No.1/3/5"], "MC1-07": [],
     }},
     CONTACT_TIP: { label:"CONTACT TIP", stages:{
-      "SC1-01": [], "SC1-02": [], "MC1-02": [], "MC1-04": [], "MC1-05": [], "MC1-07": [],
+      "SC1-01": ["W1","W2","W3"], "SC1-02": ["W1","W2","W3"], "MC1-02": ["W1","W2","W3","W4"], "MC1-04": ["W1","W2","W3","W4"], "MC1-05": ["W1","W2","W3","W4"], "MC1-07": ["W1","W2"],
     }},
   },
   FRU: {
@@ -259,7 +264,7 @@ const STATION_DATA = {
       "SA2-01,02": [], "MA2-02": [], "MA2-04": [], "MA2-06": [],
     }},
     CONTACT_TIP: { label:"CONTACT TIP", stages:{
-      "MA2-02": [], "MA2-04": [], "MA2-06": [], "SA2-01&02": [],
+      "MA2-02": ["W1","W2","W3","W4"], "MA2-04": ["W1","W2","W3","W4","W5","W6"], "MA2-06": ["W1","W2","W3","W4"], "SA2-01&02": ["W1","W2"],
     }},
   },
   FRX: {
@@ -279,7 +284,7 @@ const STATION_DATA = {
       "SC2-01": [], "SC2-02": [], "MC2-02": [], "MC2-04": [], "MC2-05": [], "MC2-07": [],
     }},
     CONTACT_TIP: { label:"CONTACT TIP", stages:{
-      "MC2-02": [], "MC2-04": [], "MC2-05": [], "MC2-07": [], "SC2-01&02": [],
+      "MC2-02": ["W1","W2","W3","W4"], "MC2-04": ["W1","W2","W3","W4"], "MC2-05": ["W1","W2","W3","W4"], "MC2-07": ["W1","W2"], "SC2-01&02": ["W1","W2","W3"],
     }},
   },
   FXC: {
@@ -297,7 +302,7 @@ const STATION_DATA = {
     FANUC: { label:"หุ่นยนต์ FANUC", stages:{
       "CP2-03": ["NO.1", "NO.3", "NO.5", "NO.2", "NO.4", "NO.6"],
     }},
-    CONTACT_TIP: { label:"CONTACT TIP", stages:{ "CP2-03": [] }},
+    CONTACT_TIP: { label:"CONTACT TIP", stages:{ "CP2-03": ["W1","W2","W3","W4","W5","W6"] }},
   },
 };
 
@@ -375,6 +380,7 @@ const CHECKS_BY_TYPE = {
   YASKAWA: FANUC_CHECKS,
   AIR: AIR_CHECKS,
   HOIST: HOIST_CHECKS,
+  CONTACT_TIP: "CONTACT_TIP_SPECIAL", // รูปแบบพิเศษ: กด "เปลี่ยนแล้ว" หรือ "ยังไม่เปลี่ยน" ต่อ W
 };
 
 // ============================================================
@@ -504,6 +510,8 @@ function renderStages(){
     el.onclick=()=>{
       nav.stage=stageName; nav.subtype=null;
       updateHeader();
+      // CONTACT_TIP แสดง W ทั้งหมดในฟอร์มเลย ไม่ผ่านหน้า subtype
+      if(nav.type==="CONTACT_TIP"){ initForm(); showPage("form"); return; }
       const subs = getSubtypes();
       if(subs.length){ renderSubtypes(); showPage("subtype"); }
       else { initForm(); showPage("form"); }
@@ -527,16 +535,63 @@ function renderSubtypes(){
 // ============================================================
 // FORM
 // ============================================================
+function isContactTip(){ return nav.type === "CONTACT_TIP"; }
+
+function getContactTipItems(){
+  // สร้างรายการ W จาก subtype ที่เลือกอยู่
+  // nav.stage = "CP1-03-W1" (รวม subtype แล้ว) แต่ตอน CONTACT_TIP
+  // เราเลือก Stage แล้ว subtype = W1..Wn รวมทั้งหมดใน stage นั้น
+  const baseStage = nav.stage; // เช่น "CP1-03"
+  const subs = STATION_DATA[nav.group]["CONTACT_TIP"].stages[baseStage] || [];
+  return subs; // ["W1","W2",...]
+}
+
 function initForm(){
-  currentChecks = CHECKS_BY_TYPE[nav.type] || DEFAULT_CHECKS;
-  checkState={};
-  currentChecks.forEach(c=>{ checkState[c.id]={result:null,comment:"",value:""}; });
+  if(isContactTip()){
+    // CONTACT_TIP: state เป็น object { W1: null, W2: null, ... }
+    currentChecks = [];
+    checkState = {};
+    getContactTipItems().forEach(w=>{ checkState[w] = null; }); // null=ยังไม่เลือก
+  } else {
+    currentChecks = CHECKS_BY_TYPE[nav.type] || DEFAULT_CHECKS;
+    checkState={};
+    currentChecks.forEach(c=>{ checkState[c.id]={result:null,comment:"",value:""}; });
+  }
   renderChecks();
 }
 
 function renderChecks(){
   const list=document.getElementById("checkList");
   list.innerHTML="";
+
+  // ===== CONTACT TIP MODE =====
+  if(isContactTip()){
+    const items = getContactTipItems();
+    if(!items.length){
+      list.innerHTML=`<div style="text-align:center;color:var(--muted);padding:24px;">ไม่พบรายการ W สำหรับ Stage นี้</div>`;
+      return;
+    }
+    const header = document.createElement("div");
+    header.style.cssText="font-size:12px;color:var(--muted);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;";
+    header.textContent="กดเลือกสถานะของแต่ละ Contact Tip";
+    list.appendChild(header);
+
+    items.forEach(w=>{
+      const status = checkState[w];
+      const row = document.createElement("div");
+      row.className="ct-row";
+      row.innerHTML=`
+        <div class="ct-label">🔌 ${w}</div>
+        <button class="ct-btn ${status==="changed"?"changed":""}" onclick="setCT('${w}','changed')">✓ เปลี่ยนแล้ว</button>
+        <button class="ct-btn ${status==="unchanged"?"unchanged":""}" onclick="setCT('${w}','unchanged')">✗ ยังไม่เปลี่ยน</button>
+      `;
+      list.appendChild(row);
+    });
+    updateProgress();
+    return;
+  }
+
+  // ===== NORMAL MODE =====
   currentChecks.forEach(c=>{
     const s=checkState[c.id];
     const div=document.createElement("div");
@@ -577,6 +632,12 @@ function renderChecks(){
     list.appendChild(div);
   });
   updateProgress();
+}
+
+
+function setCT(w, val){
+  checkState[w] = checkState[w]===val ? null : val;
+  renderChecks();
 }
 
 function setR(id,v){checkState[id].result=checkState[id].result===v?null:v;if(checkState[id].result!=="fail")checkState[id].comment="";renderChecks();}
@@ -647,9 +708,16 @@ function updateNumericStatusUI(id){
 }
 
 function updateProgress(){
-  const total=currentChecks.length;
-  const done=Object.values(checkState).filter(s=>s.result!==null).length;
-  document.getElementById("pFill").style.width=(done/total*100)+"%";
+  let total, done;
+  if(isContactTip()){
+    const items = getContactTipItems();
+    total = items.length;
+    done = items.filter(w=>checkState[w]!==null).length;
+  } else {
+    total = currentChecks.length;
+    done = Object.values(checkState).filter(s=>s.result!==null).length;
+  }
+  document.getElementById("pFill").style.width=(total?done/total*100:0)+"%";
   document.getElementById("pLabel").textContent=`ตรวจแล้ว ${done} / ${total} รายการ`;
 }
 
@@ -666,8 +734,14 @@ function submitWorker(){
   const worker=document.getElementById("workerName").value.trim();
   const date=document.getElementById("inputDate").value;
   const shift=document.getElementById("inputShift").value;
-  const undone=currentChecks.filter(c=>checkState[c.id].result===null);
-  if(undone.length){showToast("ยังตรวจไม่ครบ "+undone.length+" รายการ","err");return;}
+  // ตรวจสอบว่าตรวจครบทุกรายการ
+  let undoneCount = 0;
+  if(isContactTip()){
+    undoneCount = getContactTipItems().filter(w=>checkState[w]===null).length;
+  } else {
+    undoneCount = currentChecks.filter(c=>checkState[c.id].result===null).length;
+  }
+  if(undoneCount>0){showToast("ยังตรวจไม่ครบ "+undoneCount+" รายการ","err");return;}
   if(!worker){showToast("กรุณาใส่ชื่อ Worker","err");return;}
 
   const typeLabel = STATION_DATA[nav.group][nav.type].label;
@@ -683,7 +757,9 @@ function submitWorker(){
     stage:fullStage, stage_base:nav.stage, subtype:nav.subtype,
     worker, foreman:null,
     remark:document.getElementById("remarkText").value.trim(),
-    checks:currentChecks.map(c=>({id:c.id,name:c.name,result:checkState[c.id].result,comment:checkState[c.id].comment,value:checkState[c.id].value||""})),
+    checks: isContactTip()
+      ? getContactTipItems().map(w=>({id:w, name:"CONTACT TIP "+w, result:checkState[w]==="changed"?"pass":"fail", comment:"", value:checkState[w]||""}))
+      : currentChecks.map(c=>({id:c.id,name:c.name,result:checkState[c.id].result,comment:checkState[c.id].comment,value:checkState[c.id].value||""})),
     status:"pending"
   };
 
@@ -701,13 +777,17 @@ function submitWorker(){
 
   // แสดง success
   const failC=entry.checks.filter(c=>c.result==="fail").length;
+  const totalC=entry.checks.length;
+  const isCT = isContactTip();
+  const changedC = isCT ? entry.checks.filter(c=>c.result==="pass").length : 0;
   document.getElementById("successInfo").innerHTML=`
     <b>Group:</b> ${nav.group} &nbsp;|&nbsp; <b>ประเภท:</b> ${typeLabel}<br>
-    <b>Stage:</b> ${fullStage}<br>
+    <b>Stage:</b> ${isCT ? nav.stage : fullStage}<br>
     <b>วันที่:</b> ${date} &nbsp;|&nbsp; <b>กะ:</b> SHIFT ${shift}<br>
     <b>Worker:</b> ${worker}<br>
-    <b>ผล:</b> ผ่าน ${currentChecks.length-failC}/${currentChecks.length} รายการ
-    ${failC?`<br><span style="color:var(--red);font-weight:600;">⚠ ไม่ผ่าน ${failC} รายการ</span>`:""}
+    ${isCT
+      ? `<b>ผล:</b> เปลี่ยนแล้ว ${changedC}/${totalC} · ยังไม่เปลี่ยน ${failC}/${totalC}`
+      : `<b>ผล:</b> ผ่าน ${totalC-failC}/${totalC} รายการ${failC?`<br><span style="color:var(--red);font-weight:600;">⚠ ไม่ผ่าน ${failC} รายการ</span>`:""}`}
   `;
   document.getElementById("page-form").style.display="none";
   document.getElementById("successScreen").classList.add("show");
