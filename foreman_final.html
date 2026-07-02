@@ -66,6 +66,21 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#111827;color:#fff;border-radius:12px;padding:13px 20px;font-size:14px;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,.2);transition:transform .3s;z-index:999;text-align:center;min-width:260px;pointer-events:none;}
 .toast.show{transform:translateX(-50%) translateY(0);}
 .toast.ok{background:var(--pass);}.toast.err{background:var(--red);}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;}
+.modal-overlay.show{display:flex;}
+.modal-box{background:var(--card);border-radius:16px;padding:24px 20px;width:calc(100% - 32px);max-width:360px;box-shadow:0 12px 40px rgba(0,0,0,.2);}
+.modal-title{font-size:17px;font-weight:800;margin-bottom:6px;}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:16px;}
+.modal-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:5px;}
+.modal-input{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;font-family:'Sarabun',sans-serif;font-size:14px;outline:none;margin-bottom:12px;}
+.modal-input:focus{border-color:var(--red);}
+.modal-select{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;font-family:'Sarabun',sans-serif;font-size:14px;outline:none;background:var(--card);margin-bottom:16px;}
+.modal-row{display:flex;gap:8px;}
+.modal-btn{flex:1;padding:11px;border-radius:8px;border:none;font-family:'Sarabun',sans-serif;font-size:14px;font-weight:700;cursor:pointer;}
+.modal-btn-cancel{background:#F3F4F6;color:var(--text);}
+.modal-btn-ok{background:var(--red);color:#fff;}
+.proxy-bar{background:#FEF3C7;border-bottom:2px solid #FCD34D;padding:8px 16px;font-size:12px;font-weight:700;color:#92400E;display:none;align-items:center;gap:8px;}
+.proxy-bar.show{display:flex;}
 .spinner{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;margin-right:5px;}
 @keyframes spin{to{transform:rotate(360deg)}}
 </style>
@@ -81,6 +96,40 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
       onkeydown="if(event.key==='Enter')doLogin()">
     <button class="login-btn" onclick="doLogin()">เข้าสู่ระบบ</button>
     <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+
+<!-- Proxy Bar: แสดงเมื่อกำลังดูแทน Group อื่น -->
+<div class="proxy-bar" id="proxyBar">
+  <span>⚠</span>
+  <span id="proxyBarText">กำลังอนุมัติแทน Group — —</span>
+  <button onclick="exitProxy()" style="margin-left:auto;background:rgba(0,0,0,.1);border:none;border-radius:6px;padding:3px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Sarabun',sans-serif;">ออกจากโหมดแทน</button>
+</div>
+
+<!-- Modal: เลือก Group ที่จะดูแทน -->
+<div class="modal-overlay" id="proxyModal">
+  <div class="modal-box">
+    <div class="modal-title">🔄 อนุมัติแทน Foreman</div>
+    <div class="modal-sub">Login แล้วในฐานะตัวเอง ระบบจะบันทึกว่าคุณมาอนุมัติแทน</div>
+    <div class="modal-label">Group ที่จะดูแทน</div>
+    <select class="modal-select" id="proxyGroupSelect">
+      <option value="">-- เลือก Group --</option>
+      <option value="FRC">FRC</option>
+      <option value="FRF">FRF</option>
+      <option value="FRR">FRR</option>
+      <option value="FRU">FRU</option>
+      <option value="FRX">FRX</option>
+      <option value="FXC">FXC</option>
+    </select>
+    <div class="modal-label">Shift ที่ต้องการดูแทน</div>
+    <select class="modal-select" id="proxyShiftSelect">
+      <option value="A">SHIFT A</option>
+      <option value="B">SHIFT B</option>
+    </select>
+    <div class="modal-row">
+      <button class="modal-btn modal-btn-cancel" onclick="closeProxyModal()">ยกเลิก</button>
+      <button class="modal-btn modal-btn-ok" onclick="confirmProxy()">เริ่มอนุมัติแทน</button>
+    </div>
   </div>
 </div>
 
@@ -101,6 +150,7 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
         ✅ อนุมัติ <span class="badge" id="pendingBadge" style="display:none">0</span>
       </div>
       <div class="tab" id="tab-stations" onclick="switchTab('stations')">📊 Station ของฉัน</div>
+      <div class="tab" id="tab-proxy" onclick="openProxyModal()" style="color:var(--warn,#D97706);">🔄 แทน</div>
     </div>
   </div>
 
@@ -417,11 +467,12 @@ function buildApproveCard(s, isDone){
       </div>`).join("")}
     ${s.remark?`<div style="margin-top:8px;font-size:12px;color:var(--muted);">📝 ${s.remark}</div>`:""}
     ${!isDone?`
+      ${proxyMode?`<div style="font-size:11px;color:#92400E;background:#FEF3C7;border-radius:6px;padding:5px 10px;margin-bottom:6px;">⚠ กำลังอนุมัติแทน Group ${currentFM.group}</div>`:""}
       <div class="approve-row">
-        <input type="text" id="fn_${s.id}" value="${currentFM.name}" placeholder="ชื่อ Foreman">
+        <input type="text" id="fn_${s.id}" value="${currentFM.name}${proxyMode?" [แทน]":""}" placeholder="ชื่อ Foreman">
         <button class="approve-btn" id="ab_${s.id}" onclick="approve('${s.id}')">✓ อนุมัติ</button>
       </div>
-    `:`<div class="approved-banner">✓ อนุมัติโดย ${s.foreman} · ${new Date(s.timestamp_foreman).toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"})}</div>`}
+    `:`<div class="approved-banner">✓ อนุมัติโดย ${s.foreman}${s.proxy_by?" (แทนโดย "+s.proxy_by+")":""} · ${new Date(s.timestamp_foreman).toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"})}</div>`}
   `;
   return card;
 }
@@ -440,6 +491,12 @@ function approve(id){
   all[idx].foreman_code = currentFM.code;
   all[idx].timestamp_foreman = new Date().toISOString();
   all[idx].status = "approved";
+  // บันทึกว่าเป็นการอนุมัติแทน
+  if(proxyMode){
+    all[idx].proxy_by = currentFM.name;
+    all[idx].proxy_code = currentFM.code;
+    all[idx].proxy_for_group = currentFM.group;
+  }
   saveSubs(all);
 
   try{
@@ -509,6 +566,77 @@ function showToast(msg,type=""){
   const t=document.getElementById("toast");
   t.textContent=msg;t.className="toast show "+type;
   setTimeout(()=>t.className="toast",3000);
+}
+
+
+// ============================================================
+// PROXY APPROVAL — อนุมัติแทน
+// ============================================================
+let proxyMode = false;        // กำลังดูแทน Group อื่นอยู่ไหม
+let originalGroup = null;     // Group ของตัวเอง
+let originalShift = null;     // Shift ของตัวเอง
+
+function openProxyModal(){
+  // pre-select ค่า shift ของตัวเอง
+  document.getElementById("proxyShiftSelect").value = currentFM.shift;
+  // ลบ group ตัวเองออกจาก dropdown
+  const sel = document.getElementById("proxyGroupSelect");
+  Array.from(sel.options).forEach(opt=>{
+    opt.disabled = opt.value === currentFM.group;
+  });
+  document.getElementById("proxyModal").classList.add("show");
+}
+
+function closeProxyModal(){
+  document.getElementById("proxyModal").classList.remove("show");
+}
+
+function confirmProxy(){
+  const group = document.getElementById("proxyGroupSelect").value;
+  const shift = document.getElementById("proxyShiftSelect").value;
+  if(!group){ showToast("กรุณาเลือก Group","err"); return; }
+
+  // บันทึก group/shift เดิมก่อนเปลี่ยน
+  if(!proxyMode){
+    originalGroup = currentFM.group;
+    originalShift = currentFM.shift;
+  }
+
+  proxyMode = true;
+  currentFM.group = group;
+  currentFM.shift = shift;
+
+  // อัปเดต UI
+  const proxyBar = document.getElementById("proxyBar");
+  proxyBar.classList.add("show");
+  document.getElementById("proxyBarText").textContent =
+    `กำลังอนุมัติแทน Group ${group} SHIFT ${shift} (ในฐานะ ${currentFM.name})`;
+
+  // อัปเดต header
+  document.getElementById("fmName").textContent = currentFM.name + " [แทน " + group + "]";
+  const stageCount = getAllStagesForGroup(group).length;
+  document.getElementById("fmStations").textContent =
+    "SHIFT "+shift+" · Group "+group+" (แทน) · อนุมัติแล้ว 0/"+stageCount;
+
+  closeProxyModal();
+  renderApprove();
+  updateBadge();
+  showToast("กำลังดูแทน Group "+group+" SHIFT "+shift,"ok");
+}
+
+function exitProxy(){
+  if(!proxyMode) return;
+  proxyMode = false;
+  currentFM.group = originalGroup;
+  currentFM.shift = originalShift;
+
+  // คืน UI กลับ
+  document.getElementById("proxyBar").classList.remove("show");
+  document.getElementById("fmName").textContent = currentFM.name;
+  updateApproveCount();
+  renderApprove();
+  updateBadge();
+  showToast("กลับสู่ Group ของตัวเองแล้ว","ok");
 }
 
 setInterval(()=>{if(currentFM){updateBadge();updateApproveCount();}},30000);
