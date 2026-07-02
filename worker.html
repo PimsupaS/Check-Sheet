@@ -77,11 +77,13 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#111827;color:#fff;border-radius:12px;padding:13px 20px;font-size:14px;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,.2);transition:transform .3s;z-index:999;text-align:center;min-width:260px;pointer-events:none;}
 .toast.show{transform:translateX(-50%) translateY(0);}
 .toast.ok{background:var(--pass);}.toast.err{background:var(--red);}
-.ct-row{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:12px;border:1.5px solid var(--border);padding:12px 14px;box-shadow:var(--shadow);}
+.ct-row{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:12px;border:1.5px solid var(--border);padding:12px 14px;box-shadow:var(--shadow);transition:border-color .2s,background .2s;}
+.ct-row.ct-done{border-color:var(--pass-border);background:var(--pass-bg);}
+.ct-row.ct-zero{border-color:var(--fail-border);background:var(--fail-bg);}
 .ct-label{flex:1;font-size:15px;font-weight:700;}
-.ct-btn{padding:10px 16px;border-radius:10px;border:1.5px solid var(--border);background:#F9FAFB;font-family:'Sarabun',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;}
-.ct-btn.changed{background:var(--pass);border-color:var(--pass);color:#fff;}
-.ct-btn.unchanged{background:var(--red);border-color:var(--red);color:#fff;}
+.ct-input{width:70px;border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-family:'Sarabun',sans-serif;font-size:16px;font-weight:700;text-align:center;outline:none;transition:border-color .15s;}
+.ct-input:focus{border-color:var(--pass);}
+.ct-unit{font-size:12px;color:var(--muted);white-space:nowrap;}
 .page{display:none;}.page.active{display:block;}
 </style>
 </head>
@@ -548,10 +550,10 @@ function getContactTipItems(){
 
 function initForm(){
   if(isContactTip()){
-    // CONTACT_TIP: state เป็น object { W1: null, W2: null, ... }
+    // CONTACT_TIP: state เก็บจำนวนครั้งที่เปลี่ยน เช่น {W1: null, W2: 2, ...} null=ยังไม่กรอก
     currentChecks = [];
     checkState = {};
-    getContactTipItems().forEach(w=>{ checkState[w] = null; }); // null=ยังไม่เลือก
+    getContactTipItems().forEach(w=>{ checkState[w] = null; }); // null=ยังไม่กรอก
   } else {
     currentChecks = CHECKS_BY_TYPE[nav.type] || DEFAULT_CHECKS;
     checkState={};
@@ -577,13 +579,19 @@ function renderChecks(){
     list.appendChild(header);
 
     items.forEach(w=>{
-      const status = checkState[w];
+      const val = checkState[w];
+      const isDone = val !== null && val !== "";
+      const isZero = isDone && parseInt(val) === 0;
       const row = document.createElement("div");
-      row.className="ct-row";
+      row.className="ct-row" + (isDone && !isZero ? " ct-done" : isZero ? " ct-zero" : "");
+      row.setAttribute("data-ct", w);
       row.innerHTML=`
         <div class="ct-label">🔌 ${w}</div>
-        <button class="ct-btn ${status==="changed"?"changed":""}" onclick="setCT('${w}','changed')">✓ เปลี่ยนแล้ว</button>
-        <button class="ct-btn ${status==="unchanged"?"unchanged":""}" onclick="setCT('${w}','unchanged')">✗ ยังไม่เปลี่ยน</button>
+        <input type="number" inputmode="numeric" min="0" placeholder="จำนวน"
+          class="ct-input" value="${val !== null ? val : ""}"
+          oninput="setCTVal('${w}', this.value)"
+          onblur="setCTVal('${w}', this.value)">
+        <span class="ct-unit">ครั้ง<br><span style="font-size:10px;color:var(--muted);">(0=ไม่เปลี่ยน)</span></span>
       `;
       list.appendChild(row);
     });
@@ -635,9 +643,17 @@ function renderChecks(){
 }
 
 
-function setCT(w, val){
-  checkState[w] = checkState[w]===val ? null : val;
-  renderChecks();
+function setCTVal(w, val){
+  checkState[w] = val === "" ? null : val;
+  // อัปเดตสีกรอบแบบ in-place ไม่ re-render (กัน focus หลุด)
+  const row = document.querySelector(`.ct-row[data-ct="${w}"]`);
+  if(row){
+    row.classList.remove("ct-done","ct-zero");
+    if(val !== "" && val !== null){
+      row.classList.add(parseInt(val) === 0 ? "ct-zero" : "ct-done");
+    }
+  }
+  updateProgress();
 }
 
 function setR(id,v){checkState[id].result=checkState[id].result===v?null:v;if(checkState[id].result!=="fail")checkState[id].comment="";renderChecks();}
@@ -647,7 +663,7 @@ function setVQuiet(id,v){
   // เก็บค่าทันที (ไม่ re-render) แล้วรอ debounce ก่อนตัดสิน pass/fail
   checkState[id].value = v;
   clearTimeout(_vDebounceTimers[id]);
-  _vDebounceTimers[id] = setTimeout(()=>{ setV(id, v); }, 600);
+  _vDebounceTimers[id] = setTimeout(()=>{ setV(id, v); }, 1000);
 }
 
 function setV(id,v){
@@ -712,7 +728,7 @@ function updateProgress(){
   if(isContactTip()){
     const items = getContactTipItems();
     total = items.length;
-    done = items.filter(w=>checkState[w]!==null).length;
+    done = items.filter(w=>checkState[w]!==null && checkState[w]!=="").length;
   } else {
     total = currentChecks.length;
     done = Object.values(checkState).filter(s=>s.result!==null).length;
@@ -737,7 +753,7 @@ function submitWorker(){
   // ตรวจสอบว่าตรวจครบทุกรายการ
   let undoneCount = 0;
   if(isContactTip()){
-    undoneCount = getContactTipItems().filter(w=>checkState[w]===null).length;
+    undoneCount = getContactTipItems().filter(w=>checkState[w]===null || checkState[w]==="").length;
   } else {
     undoneCount = currentChecks.filter(c=>checkState[c.id].result===null).length;
   }
@@ -758,7 +774,7 @@ function submitWorker(){
     worker, foreman:null,
     remark:document.getElementById("remarkText").value.trim(),
     checks: isContactTip()
-      ? getContactTipItems().map(w=>({id:w, name:"CONTACT TIP "+w, result:checkState[w]==="changed"?"pass":"fail", comment:"", value:checkState[w]||""}))
+      ? getContactTipItems().map(w=>({id:w, name:"CONTACT TIP "+w, result:parseInt(checkState[w])>0?"pass":"fail", comment:"", value:checkState[w]||"0"}))
       : currentChecks.map(c=>({id:c.id,name:c.name,result:checkState[c.id].result,comment:checkState[c.id].comment,value:checkState[c.id].value||""})),
     status:"pending"
   };
