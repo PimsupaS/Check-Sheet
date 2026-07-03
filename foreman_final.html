@@ -90,9 +90,9 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 <div id="loginScreen" class="login-wrap">
   <div class="login-box">
     <div class="login-logo">ISUZU</div>
-    <div class="login-sub">Foreman</div>
+    <div class="login-sub">Foreman Portal — FRG</div>
     <label class="login-label">รหัสพนักงาน Foreman</label>
-    <input class="login-input" id="codeInput" type="text" maxlength="5" placeholder="XXXXX" inputmode="numeric"
+    <input class="login-input" id="codeInput" type="text" maxlength="5" placeholder="12345" inputmode="numeric"
       onkeydown="if(event.key==='Enter')doLogin()">
     <button class="login-btn" onclick="doLogin()">เข้าสู่ระบบ</button>
     <div class="login-err" id="loginErr"></div>
@@ -351,47 +351,40 @@ function saveSubs(arr){
   localStorage.setItem("isuzu_submissions",JSON.stringify(arr));
 }
 
-async function syncFromSheets(){
-  return new Promise((resolve)=>{
-    // ใช้ script tag แทน fetch เพราะ wifi บริษัทอาจบล็อก fetch
-    const cbName = "_fm_sync_cb_"+Date.now();
-    const script = document.createElement("script");
-    const timeout = setTimeout(()=>{
-      // fallback: ลอง fetch ตรงๆ
-      fetch(SHEETS_URL+"?t="+Date.now())
-        .then(r=>r.json())
-        .then(data=>{
-          if(data.result==="success" && data.rows && data.rows.length>0){
-            const entries = data.rows.map(row=>{
-              try{ return JSON.parse(row["JSON เต็ม"]); }catch(e){return null;}
-            }).filter(Boolean);
-            if(entries.length>0){
-              localStorage.setItem("isuzu_submissions",JSON.stringify(entries));
-            }
-          }
-          resolve(true);
-        })
-        .catch(()=>resolve(false));
-      document.head.removeChild(script);
-    }, 3000);
-
-    script.src = SHEETS_URL+"?t="+Date.now()+"&callback="+cbName;
-    window[cbName] = function(data){
-      clearTimeout(timeout);
-      delete window[cbName];
-      document.head.removeChild(script);
-      if(data && data.result==="success" && data.rows && data.rows.length>0){
-        const entries = data.rows.map(row=>{
-          try{ return JSON.parse(row["JSON เต็ม"]); }catch(e){return null;}
-        }).filter(Boolean);
-        if(entries.length>0){
-          localStorage.setItem("isuzu_submissions",JSON.stringify(entries));
+function parseRowsFromSheets(rows){
+  // หา JSON จากทุก column ที่เป็นไปได้ (รองรับกรณี column เลื่อน)
+  const entries = rows.map(row=>{
+    // ลองหา JSON เต็มจาก key ที่รู้จักก่อน
+    let jsonStr = row["JSON เต็ม"] || "";
+    // ถ้าว่าง ให้ลองหาจากทุก value ที่เหลือ (กรณี column header ผิด)
+    if(!jsonStr){
+      for(const key of Object.keys(row)){
+        const v = String(row[key]||"");
+        if(v.startsWith("{") && v.includes('"id"')){
+          jsonStr = v;
+          break;
         }
       }
-      resolve(true);
-    };
-    document.head.appendChild(script);
-  });
+    }
+    if(!jsonStr) return null;
+    try{ return JSON.parse(jsonStr); }catch(e){ return null; }
+  }).filter(Boolean);
+  return entries;
+}
+
+async function syncFromSheets(){
+  try{
+    const r = await fetch(SHEETS_URL+"?t="+Date.now());
+    const data = await r.json();
+    if(data.result==="success" && data.rows && data.rows.length>0){
+      const entries = parseRowsFromSheets(data.rows);
+      if(entries.length>0){
+        localStorage.setItem("isuzu_submissions",JSON.stringify(entries));
+        return true;
+      }
+    }
+  }catch(e){ console.log("Sync error:",e); }
+  return false;
 }
 
 function getToday(){
