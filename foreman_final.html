@@ -90,9 +90,9 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 <div id="loginScreen" class="login-wrap">
   <div class="login-box">
     <div class="login-logo">ISUZU</div>
-    <div class="login-sub">Foreman</div>
+    <div class="login-sub">Foreman Portal — FRG</div>
     <label class="login-label">รหัสพนักงาน Foreman</label>
-    <input class="login-input" id="codeInput" type="text" maxlength="5" placeholder="XXXXX" inputmode="numeric"
+    <input class="login-input" id="codeInput" type="text" maxlength="5" placeholder="12345" inputmode="numeric"
       onkeydown="if(event.key==='Enter')doLogin()">
     <button class="login-btn" onclick="doLogin()">เข้าสู่ระบบ</button>
     <div class="login-err" id="loginErr"></div>
@@ -136,7 +136,7 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 <div id="mainScreen" style="display:none;">
   <div class="header">
     <div class="header-top">
-      <div><div class="logo">ISUZU <span>FRG · Foreman</span></div></div>
+      <div><div class="logo">ISUZU <span>FRG · Foreman Portal</span></div></div>
       <div class="user-pill" onclick="logout()" id="userPill">FM001 ▾</div>
     </div>
     <div class="header-label">หน้าอนุมัติ Foreman</div>
@@ -352,24 +352,53 @@ function saveSubs(arr){
 }
 
 async function syncFromSheets(){
-  try{
-    const r = await fetch(SHEETS_URL+"?t="+Date.now());
-    const data = await r.json();
-    if(data.result==="success" && data.rows && data.rows.length>0){
-      const entries = data.rows.map(row=>{
-        try{ return JSON.parse(row["JSON เต็ม"]); }catch(e){return null;}
-      }).filter(Boolean);
-      if(entries.length>0){
-        localStorage.setItem("isuzu_submissions",JSON.stringify(entries));
-        return true;
+  return new Promise((resolve)=>{
+    // ใช้ script tag แทน fetch เพราะ wifi บริษัทอาจบล็อก fetch
+    const cbName = "_fm_sync_cb_"+Date.now();
+    const script = document.createElement("script");
+    const timeout = setTimeout(()=>{
+      // fallback: ลอง fetch ตรงๆ
+      fetch(SHEETS_URL+"?t="+Date.now())
+        .then(r=>r.json())
+        .then(data=>{
+          if(data.result==="success" && data.rows && data.rows.length>0){
+            const entries = data.rows.map(row=>{
+              try{ return JSON.parse(row["JSON เต็ม"]); }catch(e){return null;}
+            }).filter(Boolean);
+            if(entries.length>0){
+              localStorage.setItem("isuzu_submissions",JSON.stringify(entries));
+            }
+          }
+          resolve(true);
+        })
+        .catch(()=>resolve(false));
+      document.head.removeChild(script);
+    }, 3000);
+
+    script.src = SHEETS_URL+"?t="+Date.now()+"&callback="+cbName;
+    window[cbName] = function(data){
+      clearTimeout(timeout);
+      delete window[cbName];
+      document.head.removeChild(script);
+      if(data && data.result==="success" && data.rows && data.rows.length>0){
+        const entries = data.rows.map(row=>{
+          try{ return JSON.parse(row["JSON เต็ม"]); }catch(e){return null;}
+        }).filter(Boolean);
+        if(entries.length>0){
+          localStorage.setItem("isuzu_submissions",JSON.stringify(entries));
+        }
       }
-    }
-  }catch(e){console.log("Sync error:",e);}
-  return false;
+      resolve(true);
+    };
+    document.head.appendChild(script);
+  });
 }
 
 function getToday(){
-  return new Date().toISOString().split("T")[0];
+  // ใช้ timezone ไทย (UTC+7) ป้องกันวันที่เพี้ยนหลังเที่ยงคืน UTC
+  const now = new Date();
+  const thai = new Date(now.getTime() + 7*60*60*1000);
+  return thai.toISOString().split("T")[0];
 }
 
 function getMyPending(){
