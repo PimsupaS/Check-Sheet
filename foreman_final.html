@@ -100,9 +100,9 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 <div id="loginScreen" class="login-wrap">
   <div class="login-box">
     <div class="login-logo">ISUZU</div>
-    <div class="login-sub">Foreman</div>
+    <div class="login-sub">Foreman Portal — FRG</div>
     <label class="login-label">รหัสพนักงาน Foreman</label>
-    <input class="login-input" id="codeInput" type="text" maxlength="5" placeholder="XXXXX" inputmode="numeric"
+    <input class="login-input" id="codeInput" type="text" maxlength="5" placeholder="12345" inputmode="numeric"
       onkeydown="if(event.key==='Enter')doLogin()">
     <button class="login-btn" onclick="doLogin()">เข้าสู่ระบบ</button>
     <div class="login-err" id="loginErr"></div>
@@ -417,11 +417,18 @@ function getMyPending(){
   const all = getSubs();
   const today = getToday();
   return all.filter(s =>
-    s.status==="pending" &&
+    (s.status==="pending") &&
     s.group===currentFM.group &&
     s.shift===currentFM.shift &&
-    String(s.date||"").split("T")[0]===today
+    String(s.date||"").split("T")[0]===today &&
+    !isHeld(s.id)  // ไม่แสดงรายการที่กด "รอแก้ไข" แล้ว
   );
+}
+
+// เช็คว่า id นี้ถูก hold ไว้ใน localStorage หรือเปล่า
+function isHeld(id){
+  const held = JSON.parse(localStorage.getItem("isuzu_held")||"[]");
+  return held.includes(id);
 }
 function getMyDone(){
   const all = getSubs();
@@ -462,8 +469,7 @@ function renderApprove(){
 function _renderApprove(){
   if(!currentFM) return;
   const list = document.getElementById("approveList");
-  // ไม่แสดงรายการที่ส่ง "รอแก้ไข" แล้วในหน้าอนุมัติ
-  const pending = getMyPending().filter(s=>s.status!=="hold");
+  const pending = getMyPending();
   const done = getMyDone();
   list.innerHTML="";
   if(!pending.length && !done.length){
@@ -692,21 +698,13 @@ function exitProxy(){
 // HOLD FOR FIX — รอแก้ไข
 // ============================================================
 function holdForFix(id){
-  const all = getSubs();
-  const idx = all.findIndex(s=>s.id===id);
-  if(idx===-1) return;
-
-  all[idx].status = "hold";
-  all[idx].held_by = currentFM.name;
-  all[idx].held_code = currentFM.code;
-  all[idx].timestamp_hold = new Date().toISOString();
-  saveSubs(all);
-
-  // ส่ง Sheets
-  try{
-    const encoded = encodeURIComponent(JSON.stringify(all[idx]));
-    new Image().src = SHEETS_URL + "?payload=" + encoded;
-  }catch(e){}
+  // บันทึก id ที่ hold ไว้ใน localStorage แยกต่างหาก
+  // วิธีนี้ป้องกัน syncFromSheets ทับสถานะ เพราะ held list จะอยู่รอดแม้ sync
+  const held = JSON.parse(localStorage.getItem("isuzu_held")||"[]");
+  if(!held.includes(id)){
+    held.push(id);
+    localStorage.setItem("isuzu_held", JSON.stringify(held));
+  }
 
   updateBadge();
   updateHoldBadge();
@@ -717,8 +715,9 @@ function holdForFix(id){
 function getMyHold(){
   const all = getSubs();
   const today = getToday();
+  const held = JSON.parse(localStorage.getItem("isuzu_held")||"[]");
   return all.filter(s=>
-    s.status==="hold" &&
+    held.includes(s.id) &&
     s.group===currentFM.group &&
     s.shift===currentFM.shift &&
     String(s.date||"").split("T")[0]===today
