@@ -100,9 +100,9 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 <div id="loginScreen" class="login-wrap">
   <div class="login-box">
     <div class="login-logo">ISUZU</div>
-    <div class="login-sub">Foreman</div>
+    <div class="login-sub">Foreman Portal — FRG</div>
     <label class="login-label">รหัสพนักงาน Foreman</label>
-    <input class="login-input" id="codeInput" type="text" maxlength="5" placeholder="xxxxx" inputmode="numeric"
+    <input class="login-input" id="codeInput" type="text" maxlength="5" placeholder="12345" inputmode="numeric"
       onkeydown="if(event.key==='Enter')doLogin()">
     <button class="login-btn" onclick="doLogin()">เข้าสู่ระบบ</button>
     <div class="login-err" id="loginErr"></div>
@@ -396,9 +396,18 @@ async function syncFromSheets(){
     const r = await fetch(SHEETS_URL+"?t="+Date.now());
     const data = await r.json();
     if(data.result==="success" && data.rows && data.rows.length>0){
-      const entries = parseRowsFromSheets(data.rows);
-      if(entries.length>0){
-        localStorage.setItem("isuzu_submissions",JSON.stringify(entries));
+      const fromSheets = parseRowsFromSheets(data.rows);
+      if(fromSheets.length>0){
+        // Merge: ถ้า local มี approved แต่ Sheets ยังเป็น pending → ใช้ local
+        const local = getSubs();
+        const merged = fromSheets.map(se=>{
+          const le = local.find(l=>l.id===se.id);
+          if(le && le.status==="approved" && se.status==="pending") return le;
+          return se;
+        });
+        // เพิ่ม local entry ที่ยังไม่ถึง Sheets
+        local.forEach(l=>{ if(!merged.find(m=>m.id===l.id)) merged.push(l); });
+        localStorage.setItem("isuzu_submissions",JSON.stringify(merged));
         return true;
       }
     }
@@ -616,7 +625,8 @@ function renderStations(){
 
     typeInfo.stages.forEach(st=>{
       const todaySubs = all.filter(s=>
-        s.stage===st && s.group===currentFM.group &&
+        s.stage===st && s.type===typeKey &&
+        s.group===currentFM.group &&
         s.shift===currentFM.shift &&
         String(s.date||"").split("T")[0]===today
       );
