@@ -3,475 +3,473 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard — ISUZU FRG Office</title>
+<title>ISUZU FRG — Office Dashboard</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800;900&display=swap');
 :root{
-  --red:#CC0000;--red-dark:#A00000;
-  --pass:#057A55;--pass-bg:#ECFDF5;--pass-border:#6EE7B7;
-  --fail:#CC0000;--fail-bg:#FFF5F5;--fail-border:#FFBABA;
-  --warn:#D97706;--warn-bg:#FFFBEB;
-  --bg:#EDEDEE;--card:#fff;--text:#1A1A1A;--muted:#6B7280;--border:#E5E7EB;
-  --shadow:0 1px 6px rgba(0,0,0,.08);
+  --red:#CC0000;--pass:#057A55;--pass-bg:#ECFDF5;--pass-border:#6EE7B7;
+  --fail-bg:#FFF5F5;--fail-border:#FFBABA;--warn:#D97706;--warn-bg:#FFFBEB;--warn-border:#FCD34D;
+  --bg:#F2F2F3;--card:#fff;--text:#111827;--muted:#6B7280;--border:#E5E7EB;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
-.header{background:var(--red);color:#fff;padding:14px 16px 16px;display:flex;justify-content:space-between;align-items:center;}
-.logo{font-size:18px;font-weight:800;letter-spacing:.05em;}
-.logo span{display:block;font-size:10px;font-weight:500;opacity:.65;}
+.header{background:var(--red);color:#fff;padding:16px 20px 18px;}
+.header-row{display:flex;justify-content:space-between;align-items:flex-start;}
+.brand{font-size:20px;font-weight:900;letter-spacing:.04em;}
+.brand-sub{font-size:11px;opacity:.7;margin-top:1px;}
 .live-wrap{text-align:right;}
-.live-dot{display:inline-block;width:7px;height:7px;background:#4ADE80;border-radius:50%;margin-right:4px;animation:pulse 2s infinite;}
+.live-pill{display:flex;align-items:center;gap:5px;justify-content:flex-end;font-size:12px;font-weight:700;}
+.live-dot{width:7px;height:7px;border-radius:50%;background:#4ADE80;animation:pulse 2s infinite;}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.live-text{font-size:12px;font-weight:600;}
-.last-update{font-size:10px;opacity:.6;margin-top:2px;}
-.summary-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 10px 0;}
-.sum-card{background:var(--card);border-radius:10px;padding:10px 8px;text-align:center;box-shadow:var(--shadow);}
-.sum-num{font-size:26px;font-weight:800;line-height:1;}
-.sum-label{font-size:10px;color:var(--muted);margin-top:3px;font-weight:600;}
-.sum-done .sum-num{color:var(--pass);}
-.sum-fail .sum-num{color:var(--red);}
-.sum-wait .sum-num{color:#9CA3AF;}
-.sum-total .sum-num{color:#1A56DB;}
-.filter-bar{display:flex;gap:6px;margin:10px 10px 0;flex-wrap:wrap;align-items:center;}
-.filter-btn{padding:6px 12px;border-radius:6px;border:1.5px solid var(--border);background:var(--card);font-family:'Sarabun',sans-serif;font-size:12px;font-weight:700;cursor:pointer;color:var(--muted);transition:all .15s;}
-.filter-btn.active{background:var(--red);border-color:var(--red);color:#fff;}
-.date-input{border:1.5px solid var(--border);border-radius:6px;padding:5px 8px;font-family:'Sarabun',sans-serif;font-size:12px;outline:none;background:var(--card);}
-.date-input:focus{border-color:var(--red);}
-.export-btn{margin-left:auto;background:#057A55;color:#fff;border:none;border-radius:6px;padding:6px 12px;font-family:'Sarabun',sans-serif;font-size:12px;font-weight:700;cursor:pointer;}
-.alert-section{margin:10px 10px 0;}
-.alert-box{background:var(--fail-bg);border:1.5px solid var(--fail-border);border-radius:10px;padding:10px 12px;margin-bottom:6px;}
+.update-time{font-size:10px;opacity:.65;margin-top:2px;}
+.header-date{font-size:12px;font-weight:600;opacity:.8;margin-top:8px;}
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 14px 0;}
+.sc{background:var(--card);border-radius:12px;padding:12px 8px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.07);}
+.sc-num{font-size:28px;font-weight:900;line-height:1;}
+.sc-label{font-size:10px;color:var(--muted);font-weight:600;margin-top:3px;}
+.sc-total .sc-num{color:#1A56DB;}.sc-pass .sc-num{color:var(--pass);}
+.sc-fail .sc-num{color:var(--red);}.sc-wait .sc-num{color:#9CA3AF;}
+.filter-bar{display:flex;gap:6px;padding:10px 14px 0;flex-wrap:wrap;align-items:center;}
+.fbtn{padding:6px 14px;border-radius:8px;border:1.5px solid var(--border);background:var(--card);
+  font-family:'Sarabun',sans-serif;font-size:13px;font-weight:700;cursor:pointer;color:var(--muted);}
+.fbtn.active{background:var(--red);border-color:var(--red);color:#fff;}
+.date-input{border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;
+  font-family:'Sarabun',sans-serif;font-size:13px;outline:none;background:var(--card);}
+.export-btn{margin-left:auto;background:var(--pass);color:#fff;border:none;border-radius:8px;
+  padding:6px 14px;font-family:'Sarabun',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
+.refresh-bar{display:flex;align-items:center;padding:8px 14px 0;font-size:12px;color:var(--muted);}
+.refresh-btn{margin-left:auto;background:var(--card);border:1.5px solid var(--border);border-radius:8px;
+  padding:4px 12px;font-family:'Sarabun',sans-serif;font-size:12px;font-weight:700;cursor:pointer;}
+/* TYPE CARDS */
+.type-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:12px 14px 0;}
+.tc{background:var(--card);border-radius:16px;padding:18px 16px;cursor:pointer;
+  border:2px solid transparent;box-shadow:0 1px 4px rgba(0,0,0,.08);transition:all .15s;position:relative;overflow:hidden;}
+.tc:active{transform:scale(.97);}
+.tc.tc-pass{border-color:var(--pass-border);background:var(--pass-bg);}
+.tc.tc-fail{border-color:var(--fail-border);background:var(--fail-bg);}
+.tc.tc-warn{border-color:var(--warn-border);background:var(--warn-bg);}
+.tc-icon{font-size:24px;margin-bottom:6px;}
+.tc-name{font-size:13px;font-weight:700;color:var(--muted);margin-bottom:10px;}
+.tc-ratio{font-size:32px;font-weight:900;line-height:1;margin-bottom:8px;}
+.tc-pass .tc-ratio{color:var(--pass);}.tc-fail .tc-ratio{color:var(--red);}
+.tc-warn .tc-ratio{color:var(--warn);}.tc .tc-ratio{color:#D1D5DB;}
+.tc-badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;
+  padding:4px 12px;border-radius:20px;}
+.tc-pass .tc-badge{background:var(--pass);color:#fff;}
+.tc-fail .tc-badge{background:var(--red);color:#fff;}
+.tc-warn .tc-badge{background:var(--warn);color:#fff;}
+.tc .tc-badge{background:#E5E7EB;color:var(--muted);}
+.fail-dot{position:absolute;top:12px;right:12px;background:var(--red);color:#fff;
+  border-radius:50%;width:22px;height:22px;font-size:11px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;}
+/* ALERT */
+.alert-box{margin:10px 14px 0;background:var(--fail-bg);border:1.5px solid var(--fail-border);
+  border-radius:12px;padding:10px 14px;}
 .alert-title{font-size:12px;font-weight:700;color:var(--red);margin-bottom:3px;}
-.alert-body{font-size:11px;color:var(--text);line-height:1.6;}
-.group-section{margin:10px 10px 0;}
-.group-header{display:flex;align-items:center;gap:8px;margin-bottom:6px;cursor:pointer;user-select:none;}
-.group-icon{font-size:16px;}
-.group-name{font-size:13px;font-weight:800;color:var(--text);}
-.group-stats{margin-left:auto;font-size:11px;color:var(--muted);font-weight:600;}
-.group-toggle{font-size:12px;color:var(--muted);}
-.type-wrap{background:var(--card);border-radius:10px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:10px;}
-.type-title-bar{background:#F3F4F6;padding:7px 12px;font-size:12px;font-weight:700;color:var(--text);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
-.type-stats{margin-left:auto;font-size:11px;color:var(--muted);}
-.stage-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:1px;background:var(--border);}
-.stage-cell{background:var(--card);padding:8px 6px;text-align:center;position:relative;}
-.stage-cell.done{background:var(--pass-bg);}
-.stage-cell.fail{background:var(--fail-bg);}
-.stage-cell.pending{background:#FAFAFA;}
-.stage-cell.partial{background:var(--warn-bg);}
-.stage-name{font-size:10px;font-weight:700;line-height:1.2;margin-bottom:4px;word-break:break-all;}
-.shift-row{display:flex;gap:3px;justify-content:center;}
-.shift-tag{font-size:9px;font-weight:700;padding:2px 5px;border-radius:4px;line-height:1;}
-.shift-done{background:var(--pass-bg);color:var(--pass);border:1px solid var(--pass-border);}
-.shift-fail{background:var(--fail-bg);color:var(--red);border:1px solid var(--fail-border);}
-.shift-wait{background:#F3F4F6;color:#9CA3AF;border:1px solid #E5E7EB;}
-.stage-time{font-size:9px;color:var(--muted);margin-top:3px;}
-.fail-dot{width:6px;height:6px;background:var(--red);border-radius:50%;position:absolute;top:5px;right:5px;}
-.legend{display:flex;gap:12px;margin:10px 10px 4px;flex-wrap:wrap;}
-.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);}
-.legend-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
-.refresh-bar{display:flex;align-items:center;justify-content:space-between;margin:8px 10px 0;}
-.countdown-text{font-size:11px;color:var(--muted);}
-.refresh-btn{background:var(--card);border:1.5px solid var(--border);border-radius:6px;padding:5px 12px;font-family:'Sarabun',sans-serif;font-size:12px;font-weight:600;cursor:pointer;}
-.group-body{transition:all .2s;}
-.group-body.collapsed{display:none;}
+.alert-body{font-size:12px;color:var(--text);}
+/* MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;
+  align-items:flex-end;justify-content:center;}
+.overlay.show{display:flex;}
+.drawer{background:var(--card);border-radius:20px 20px 0 0;width:100%;max-width:640px;
+  max-height:88vh;overflow-y:auto;padding-bottom:40px;}
+.drawer-handle{width:36px;height:4px;background:#D1D5DB;border-radius:99px;margin:12px auto 0;}
+.drawer-header{padding:14px 18px 10px;border-bottom:1px solid var(--border);
+  position:sticky;top:0;background:var(--card);z-index:1;}
+.drawer-title{font-size:18px;font-weight:900;}
+.drawer-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+.drawer-close{float:right;background:none;border:none;font-size:24px;cursor:pointer;
+  color:var(--muted);line-height:1;margin-top:-2px;}
+/* GROUP ROW inside modal */
+.group-row{margin:10px 18px 0;}
+.group-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--muted);margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+.group-prog{flex:1;height:5px;background:var(--border);border-radius:99px;overflow:hidden;}
+.group-prog-fill{height:100%;background:var(--pass);border-radius:99px;}
+.group-pct{font-size:11px;font-weight:700;color:var(--muted);}
+/* STAGE ITEMS */
+.stage-list{display:flex;flex-direction:column;gap:6px;margin-top:6px;}
+.si{border-radius:12px;padding:11px 14px;border:1.5px solid var(--border);background:#FAFAFA;}
+.si.si-pass{background:var(--pass-bg);border-color:var(--pass-border);}
+.si.si-fail{background:var(--fail-bg);border-color:var(--fail-border);}
+.si-header{display:flex;align-items:center;gap:8px;}
+.si-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.dp{background:var(--pass);}.df{background:var(--red);}.dw{background:#D1D5DB;}
+.si-name{font-size:14px;font-weight:700;flex:1;}
+.si-tag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;}
+.tp{background:var(--pass);color:#fff;}.tf{background:var(--red);color:#fff;}.tw{background:#E5E7EB;color:var(--muted);}
+.si-checks{margin-top:8px;padding-top:7px;border-top:1px solid rgba(0,0,0,.07);}
+.ck{display:flex;justify-content:space-between;font-size:12px;padding:2px 0;}
+.ck.ck-fail{color:var(--red);font-weight:600;}
+.ck-val{font-weight:700;}
+.si-meta{font-size:11px;color:var(--muted);margin-top:5px;}
 </style>
 </head>
 <body>
 
 <div class="header">
-  <div>
-    <div class="logo">ISUZU FRG <span>Office Dashboard · Real-time</span></div>
-    <div style="font-size:11px;opacity:.75;margin-top:4px;" id="headerDate"></div>
+  <div class="header-row">
+    <div><div class="brand">ISUZU FRG</div><div class="brand-sub">Office Dashboard · Real-time</div></div>
+    <div class="live-wrap">
+      <div class="live-pill"><span class="live-dot"></span>LIVE</div>
+      <div class="update-time" id="lastUpdate">--:--:--</div>
+    </div>
   </div>
-  <div class="live-wrap">
-    <div><span class="live-dot"></span><span class="live-text">LIVE</span></div>
-    <div class="last-update" id="lastUpdate">กำลังโหลด...</div>
-  </div>
+  <div class="header-date" id="headerDate"></div>
 </div>
 
-<div class="summary-row">
-  <div class="sum-card sum-total"><div class="sum-num" id="sumTotal">0</div><div class="sum-label">ทั้งหมด</div></div>
-  <div class="sum-card sum-done"><div class="sum-num" id="sumDone">0</div><div class="sum-label">ผ่านแล้ว</div></div>
-  <div class="sum-card sum-fail"><div class="sum-num" id="sumFail">0</div><div class="sum-label">พบปัญหา</div></div>
-  <div class="sum-card sum-wait"><div class="sum-num" id="sumWait">0</div><div class="sum-label">รอตรวจ</div></div>
+<div class="summary">
+  <div class="sc sc-total"><div class="sc-num" id="sTotal">0</div><div class="sc-label">ทั้งหมด</div></div>
+  <div class="sc sc-pass"><div class="sc-num" id="sPass">0</div><div class="sc-label">ผ่านแล้ว</div></div>
+  <div class="sc sc-fail"><div class="sc-num" id="sFail">0</div><div class="sc-label">พบปัญหา</div></div>
+  <div class="sc sc-wait"><div class="sc-num" id="sWait">0</div><div class="sc-label">รอตรวจ</div></div>
 </div>
 
 <div class="filter-bar">
-  <button class="filter-btn active" onclick="setShift('ALL',this)">ทั้งหมด</button>
-  <button class="filter-btn" onclick="setShift('A',this)">SHIFT A</button>
-  <button class="filter-btn" onclick="setShift('B',this)">SHIFT B</button>
+  <button class="fbtn active" onclick="setShift('ALL',this)">ทั้งหมด</button>
+  <button class="fbtn" onclick="setShift('A',this)">SHIFT A</button>
+  <button class="fbtn" onclick="setShift('B',this)">SHIFT B</button>
   <input type="date" class="date-input" id="filterDate" onchange="renderDashboard()">
   <button class="export-btn" onclick="exportCSV()">📥 Export</button>
 </div>
-
-<div class="legend">
-  <div class="legend-item"><div class="legend-dot" style="background:var(--pass-bg);border:1px solid var(--pass-border);"></div>ผ่าน</div>
-  <div class="legend-item"><div class="legend-dot" style="background:var(--fail-bg);border:1px solid var(--fail-border);"></div>พบปัญหา</div>
-  <div class="legend-item"><div class="legend-dot" style="background:var(--warn-bg);border:1px solid #FCD34D;"></div>ผ่านบางกะ</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#FAFAFA;border:1px solid var(--border);"></div>รอตรวจ</div>
-</div>
-
-<div class="alert-section" id="alertSection" style="display:none;">
-  <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--red);margin-bottom:6px;">⚠ แจ้งเตือนปัญหา</div>
-  <div id="alertList"></div>
-</div>
-
 <div class="refresh-bar">
-  <div class="countdown-text" id="countdownText">รีเฟรชอัตโนมัติใน 30 วิ</div>
+  <span id="countdownText">รีเฟรชใน 30 วิ</span>
   <button class="refresh-btn" onclick="refresh()">🔄 รีเฟรช</button>
 </div>
 
-<div id="mainContent"></div>
+<div id="alertArea"></div>
+<div class="type-grid" id="typeGrid"></div>
+
+<!-- MODAL DRAWER -->
+<div class="overlay" id="overlay" onclick="tryClose(event)">
+  <div class="drawer" id="drawer">
+    <div class="drawer-handle"></div>
+    <div class="drawer-header">
+      <button class="drawer-close" onclick="closeModal()">×</button>
+      <div class="drawer-title" id="drawerTitle">—</div>
+      <div class="drawer-sub" id="drawerSub">—</div>
+    </div>
+    <div id="drawerBody"></div>
+  </div>
+</div>
 
 <script>
-const SHEETS_URL = "https://script.google.com/macros/s/AKfycbxFpwj3ZzsQK6CbbyiS-kyuiFPQd_3dNge_VE_7qgjxs5JsbaUN6eGjYkEXS7UfC6Mk/exec";
+const SHEETS_URL="https://script.google.com/macros/s/AKfycbxFpwj3ZzsQK6CbbyiS-kyuiFPQd_3dNge_VE_7qgjxs5JsbaUN6eGjYkEXS7UfC6Mk/exec";
 
-// ============================================================
-// STATION DATA (เหมือนกับ worker_v2.html / foreman_v2.html)
-// ============================================================
-const STATION_DATA = {
-  FRC: {
-    CO2: { label:"เครื่องเชื่อม CO2", stages:{
-      "CP1-02": ["FRT-LH", "RR-LH", "FRT-RH", "RR-RH"],
-      "CP1-04": ["FRT-LH", "RR-LH", "FRT-RH", "RR-RH"],
-      "CP1-05": ["FRT-LH", "RR-LH", "FRT-RH", "RR-RH"],
-    }},
-    JIG: { label:"JIG", stages:{ "CP1-02": [], "CP1-03": [], "CP1-04": [], "CP1-05": [] }},
-    AIR: { label:"AIR SERVICE UNIT", stages:{ "CP1-02": [], "CP1-03": [], "CP1-04": [], "CP1-05": [] }},
-    FANUC: { label:"หุ่นยนต์ FANUC", stages:{
-      "CP1-03-LH": ["no.1", "no.3", "no.5"], "CP1-03-RH": ["no.2", "no.4", "no.6"],
-    }},
-    CONTACT_TIP: { label:"CONTACT TIP", stages:{ "CP1-03": [] }},
+// ประเภทหลัก 7 ประเภท (แสดงบนหน้าหลัก)
+const TYPE_META={
+  HOIST:{label:"ELECTRIC HOIST",icon:"⚙️"},
+  CO2:{label:"เครื่องเชื่อม CO2",icon:"🔥"},
+  JIG:{label:"JIG",icon:"🔧"},
+  AIR:{label:"AIR SERVICE UNIT",icon:"💨"},
+  FANUC:{label:"หุ่นยนต์ FANUC",icon:"🤖"},
+  YASKAWA:{label:"หุ่นยนต์ YASKAWA",icon:"🤖"},
+  CONTACT_TIP:{label:"CONTACT TIP",icon:"🔌"},
+};
+
+const STATION_DATA={
+  FRC:{
+    CO2:{stages:{"CP1-02":["FRT-LH","RR-LH","FRT-RH","RR-RH"],"CP1-04":["FRT-LH","RR-LH","FRT-RH","RR-RH"],"CP1-05":["FRT-LH","RR-LH","FRT-RH","RR-RH"]}},
+    JIG:{stages:{"CP1-02":[],"CP1-03":[],"CP1-04":[],"CP1-05":[]}},
+    AIR:{stages:{"CP1-02":[],"CP1-03":[],"CP1-04":[],"CP1-05":[]}},
+    FANUC:{stages:{"CP1-03-LH":["no.1","no.3","no.5"],"CP1-03-RH":["no.2","no.4","no.6"]}},
+    CONTACT_TIP:{stages:{"CP1-03":["W1","W2","W3","W4","W5","W6"]}},
   },
-  FRF: {
-    HOIST: { label:"ELECTRIC HOIST", stages:{ "SA1-01": [] }},
-    CO2: { label:"เครื่องเชื่อม CO2", stages:{ "SA1-02": [], "MA1-7.5": ["LH", "RH"], "MA1-09": ["LH", "RH"] }},
-    JIG: { label:"JIG", stages:{
-      "SA1-01": [], "SA1-02": [], "MA1-00": [], "MA1-02": [],
-      "MA1-04": [], "MA1-06": [], "MA1-07": [], "MA1-09": [],
-    }},
-    AIR: { label:"AIR SERVICE UNIT", stages:{
-      "SA1-01&02": [], "MA1-00&02": [], "MA1-03-05": [], "MA1-04": [],
-      "MA1-06": [], "MA1-07": [], "MA1-09": [],
-    }},
-    YASKAWA: { label:"หุ่นยนต์ YASKAWA", stages:{
-      "SA1-01": [], "SA1-02": [], "MA1-02": [],
-      "MA1-04": ["No.2/4/6", "No.1/3/5"], "MA1-06": [],
-    }},
-    CONTACT_TIP: { label:"CONTACT TIP", stages:{ "MA1-02": ["W1","W2","W3","W4"], "MA1-04": ["W1","W2","W3","W4","W5","W6"], "MA1-06": ["W1","W2","W3","W4"], "SA1-01": ["W1","W2"], "SA1-02": ["W1","W2"] }},
+  FRF:{
+    HOIST:{stages:{"SA1-01":[]}},
+    CO2:{stages:{"SA1-02":[],"MA1-7.5":["LH","RH"],"MA1-09":["LH","RH"]}},
+    JIG:{stages:{"SA1-01":[],"SA1-02":[],"MA1-00":[],"MA1-02":[],"MA1-04":[],"MA1-06":[],"MA1-07":[],"MA1-09":[]}},
+    AIR:{stages:{"SA1-01&02":[],"MA1-00&02":[],"MA1-03-05":[],"MA1-04":[],"MA1-06":[],"MA1-07":[],"MA1-09":[]}},
+    YASKAWA:{stages:{"SA1-01":[],"SA1-02":[],"MA1-02":[],"MA1-04":["No.2/4/6","No.1/3/5"],"MA1-06":[]}},
+    CONTACT_TIP:{stages:{"MA1-02":["W1","W2","W3","W4"],"MA1-04":["W1","W2","W3","W4","W5","W6"],"MA1-06":["W1","W2","W3","W4"],"SA1-01":["W1","W2"],"SA1-02":["W1","W2"]}},
   },
-  FRR: {
-    HOIST: { label:"ELECTRIC HOIST", stages:{ "SC1-01": [] }},
-    CO2: { label:"เครื่องเชื่อม CO2", stages:{ "MC1-8.5": ["LH", "RH"], "MC1-10": ["LH", "RH"] }},
-    JIG: { label:"JIG", stages:{
-      "SC1-01": [], "SC1-02": [], "MC1-01": [], "MC1-02": [],
-      "MC1-04": [], "MC1-05": [], "MC1-07": [], "MC1-08": [], "MC1-10": [],
-    }},
-    AIR: { label:"AIR SERVICE UNIT", stages:{
-      "SC1-01": [], "SC1-02": [], "MC1-01,02": [], "MC1-04": [],
-      "MC1-05": [], "MC1-07,08": [], "MC1-8.5": ["H8", "H7"], "MC1-10": ["H9", "H10", "Jig", "Lifter"],
-    }},
-    YASKAWA: { label:"หุ่นยนต์ YASKAWA", stages:{
-      "SC1-01": [], "SC1-02": [], "MC1-02": [],
-      "MC1-04": ["No.2/4/6"], "MC1-05": ["No.1/3/5"], "MC1-07": [],
-    }},
-    CONTACT_TIP: { label:"CONTACT TIP", stages:{
-      "SC1-01": [], "SC1-02": [], "MC1-02": [], "MC1-04": [], "MC1-05": [], "MC1-07": [],
-    }},
+  FRR:{
+    HOIST:{stages:{"SC1-01":[]}},
+    CO2:{stages:{"MC1-8.5":["LH","RH"],"MC1-10":["LH","RH"]}},
+    JIG:{stages:{"SC1-01":[],"SC1-02":[],"MC1-01":[],"MC1-02":[],"MC1-04":[],"MC1-05":[],"MC1-07":[],"MC1-08":[],"MC1-10":[]}},
+    AIR:{stages:{"SC1-01":[],"SC1-02":[],"MC1-01,02":[],"MC1-04":[],"MC1-05":[],"MC1-07,08":[],"MC1-8.5":["H8","H7"],"MC1-10":["H9","H10","Jig","Lifter"]}},
+    YASKAWA:{stages:{"SC1-01":[],"SC1-02":[],"MC1-02":[],"MC1-04":["No.2/4/6"],"MC1-05":["No.1/3/5"],"MC1-07":[]}},
+    CONTACT_TIP:{stages:{"SC1-01":["W1","W2","W3"],"SC1-02":["W1","W2","W3"],"MC1-02":["W1","W2","W3","W4"],"MC1-04":["W1","W2","W3","W4"],"MC1-05":["W1","W2","W3","W4"],"MC1-07":["W1","W2"]}},
   },
-  FRU: {
-    HOIST: { label:"ELECTRIC HOIST", stages:{ "SA2-01": [] }},
-    CO2: { label:"เครื่องเชื่อม CO2", stages:{ "MA2-07": ["LH", "RH"], "MA2-09": ["LH", "RH"] }},
-    JIG: { label:"JIG", stages:{
-      "SA2-01": [], "SA2-02": [], "MA2-01": [], "MA2-02": [], "MA2-04": [], "MA2-06": [], "MA2-09": [],
-    }},
-    AIR: { label:"AIR SERVICE UNIT", stages:{
-      "SA2-01&02": [], "MA2-01&02": [], "MA2-04": [], "MA2-06": [], "MA2-09": ["H8", "H9"],
-    }},
-    FANUC: { label:"หุ่นยนต์ FANUC", stages:{ "SA2-01,02": [], "MA2-02": [], "MA2-04": [], "MA2-06": [] }},
-    CONTACT_TIP: { label:"CONTACT TIP", stages:{ "MA2-02": ["W1","W2","W3","W4"], "MA2-04": ["W1","W2","W3","W4","W5","W6"], "MA2-06": ["W1","W2","W3","W4"], "SA2-01": ["W1","W2"], "SA2-02": ["W1","W2"] }},
+  FRU:{
+    HOIST:{stages:{"SA2-01":[]}},
+    CO2:{stages:{"MA2-07":["LH","RH"],"MA2-09":["LH","RH"]}},
+    JIG:{stages:{"SA2-01":[],"SA2-02":[],"MA2-01":[],"MA2-02":[],"MA2-04":[],"MA2-06":[],"MA2-09":[]}},
+    AIR:{stages:{"SA2-01&02":[],"MA2-01&02":[],"MA2-04":[],"MA2-06":[],"MA2-09":["H8","H9"]}},
+    FANUC:{stages:{"SA2-01,02":[],"MA2-02":[],"MA2-04":[],"MA2-06":[]}},
+    CONTACT_TIP:{stages:{"MA2-02":["W1","W2","W3","W4"],"MA2-04":["W1","W2","W3","W4","W5","W6"],"MA2-06":["W1","W2","W3","W4"],"SA2-01":["W1","W2"],"SA2-02":["W1","W2"]}},
   },
-  FRX: {
-    HOIST: { label:"ELECTRIC HOIST", stages:{ "SC2-01": [] }},
-    CO2: { label:"เครื่องเชื่อม CO2", stages:{ "SC2-02": [], "MC2-08": ["LH", "RH"], "MC2-10": ["LH", "RH"] }},
-    JIG: { label:"JIG", stages:{
-      "SC2-01": ["RG2u-RJ2u"], "SC2-02": ["RG2u-RJ2u"],
-      "MC2-01": [], "MC2-02": [], "MC2-04": [], "MC2-05": [], "MC2-07": [], "MC2-10": [],
-    }},
-    AIR: { label:"AIR SERVICE UNIT", stages:{
-      "SC2-01": [], "SC2-02": [], "MC2-01,02": [], "MC2-04,05": [], "MC2-07": [],
-      "MC2-10": ["H8", "H9", "H10", "Jig"],
-    }},
-    FANUC: { label:"หุ่นยนต์ FANUC", stages:{
-      "SC2-01": [], "SC2-02": [], "MC2-02": [], "MC2-04": [], "MC2-05": [], "MC2-07": [],
-    }},
-    CONTACT_TIP: { label:"CONTACT TIP", stages:{
-      "MC2-02": ["W1","W2","W3","W4"], "MC2-04": ["W1","W2","W3","W4"], "MC2-05": ["W1","W2","W3","W4"], "MC2-07": ["W1","W2"], "SC2-01": ["W1","W2","W3"], "SC2-02": ["W1","W2","W3"],
-    }},
+  FRX:{
+    HOIST:{stages:{"SC2-01":[]}},
+    CO2:{stages:{"SC2-02":[],"MC2-08":["LH","RH"],"MC2-10":["LH","RH"]}},
+    JIG:{stages:{"SC2-01":["RG2u-RJ2u"],"SC2-02":["RG2u-RJ2u"],"MC2-01":[],"MC2-02":[],"MC2-04":[],"MC2-05":[],"MC2-07":[],"MC2-10":[]}},
+    AIR:{stages:{"SC2-01":[],"SC2-02":[],"MC2-01,02":[],"MC2-04,05":[],"MC2-07":[],"MC2-10":["H8","H9","H10","Jig"]}},
+    FANUC:{stages:{"SC2-01":[],"SC2-02":[],"MC2-02":[],"MC2-04":[],"MC2-05":[],"MC2-07":[]}},
+    CONTACT_TIP:{stages:{"MC2-02":["W1","W2","W3","W4"],"MC2-04":["W1","W2","W3","W4"],"MC2-05":["W1","W2","W3","W4"],"MC2-07":["W1","W2"],"SC2-01":["W1","W2","W3"],"SC2-02":["W1","W2","W3"]}},
   },
-  FXC: {
-    CO2: { label:"เครื่องเชื่อม CO2", stages:{
-      "CP2-02": ["007", "008", "009", "010"], "CP2-04": ["011", "012", "013", "014"], "CP2-05": ["015", "016", "017", "018"],
-    }},
-    JIG: { label:"JIG", stages:{ "CP2-02": [], "CP2-03": [], "CP2-04": [], "CP2-05": [] }},
-    AIR: { label:"AIR SERVICE UNIT", stages:{ "CP2-02": [], "CP2-03": [], "CP2-04": [], "CP2-05": [] }},
-    FANUC: { label:"หุ่นยนต์ FANUC", stages:{ "CP2-03": ["NO.1", "NO.3", "NO.5", "NO.2", "NO.4", "NO.6"] }},
-    CONTACT_TIP: { label:"CONTACT TIP", stages:{ "CP2-03": [] }},
+  FXC:{
+    CO2:{stages:{"CP2-02":["007","008","009","010"],"CP2-04":["011","012","013","014"],"CP2-05":["015","016","017","018"]}},
+    JIG:{stages:{"CP2-02":[],"CP2-03":[],"CP2-04":[],"CP2-05":[]}},
+    AIR:{stages:{"CP2-02":[],"CP2-03":[],"CP2-04":[],"CP2-05":[]}},
+    FANUC:{stages:{"CP2-03":["NO.1","NO.3","NO.5","NO.2","NO.4","NO.6"]}},
+    CONTACT_TIP:{stages:{"CP2-03":["W1","W2","W3","W4","W5","W6"]}},
   },
 };
 
-const TYPE_ICONS = { HOIST:"⚙️", CO2:"🔥", JIG:"🔧", AIR:"💨", FANUC:"🤖", YASKAWA:"🤖", CONTACT_TIP:"🔌" };
+function getAllStages(group,typeKey){
+  const t=STATION_DATA[group]&&STATION_DATA[group][typeKey];
+  if(!t) return [];
+  const r=[];
+  Object.entries(t.stages).forEach(([base,subs])=>{
+    if(subs.length) subs.forEach(s=>r.push(base+"-"+s)); else r.push(base);
+  });
+  return r;
+}
 
-let currentShift = "ALL";
-let countdown = 30;
+let allSubs=[];
+let currentShift="ALL";
+let countdown=30;
 let countdownTimer;
-let allSubs = [];
-let groupCollapsed = {};
 
-const today = new Date();
-document.getElementById("filterDate").value = today.toISOString().split("T")[0];
-document.getElementById("headerDate").textContent =
-  today.toLocaleDateString("th-TH",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+const todayDate=new Date();
+document.getElementById("filterDate").value=todayDate.toISOString().split("T")[0];
+document.getElementById("headerDate").textContent=
+  todayDate.toLocaleDateString("th-TH",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
 
-function setShift(s, btn){
-  currentShift = s;
-  document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active"));
-  btn.classList.add("active");
-  renderDashboard();
-}
-
-function getSubs(){
-  return JSON.parse(localStorage.getItem("isuzu_submissions")||"[]");
-}
+function getSubs(){return JSON.parse(localStorage.getItem("isuzu_submissions")||"[]");}
 
 function parseRows(rows){
   return rows.map(row=>{
-    // ลองหา JSON จาก column "JSON เต็ม" ก่อน
-    let jsonStr = row["JSON เต็ม"] || "";
-    // fallback: ถ้าว่าง ให้ไล่หาจากทุก column (รองรับกรณี header เลื่อน)
-    if(!jsonStr || jsonStr==="{}" ){
-      for(const key of Object.keys(row)){
-        const v = String(row[key]||"");
-        if(v.startsWith("{") && v.includes('"id"') && v.includes('"stage"')){
-          jsonStr = v; break;
-        }
+    let j=row["JSON เต็ม"]||"";
+    if(!j||j==="{}"){
+      for(const k of Object.keys(row)){
+        const v=String(row[k]||"");
+        if(v.startsWith("{")&&v.includes('"id"')&&v.includes('"stage"')){j=v;break;}
       }
     }
-    if(!jsonStr) return null;
-    try{
-      const e = JSON.parse(jsonStr);
-      return (e && e.id) ? e : null;
-    }catch(e){ return null; }
+    if(!j) return null;
+    try{const e=JSON.parse(j);return(e&&e.id)?e:null;}catch(e){return null;}
   }).filter(Boolean);
 }
 
 async function syncFromSheets(){
   try{
-    const r = await fetch(SHEETS_URL+"?t="+Date.now());
-    const data = await r.json();
-    if(data.result==="success" && data.rows && data.rows.length>0){
-      const entries = parseRows(data.rows);
-      if(entries.length>0){
-        allSubs = entries;
-        localStorage.setItem("isuzu_submissions",JSON.stringify(entries));
-      }
+    const r=await fetch(SHEETS_URL+"?t="+Date.now());
+    const data=await r.json();
+    if(data.result==="success"&&data.rows&&data.rows.length>0){
+      const entries=parseRows(data.rows);
+      if(entries.length>0){allSubs=entries;localStorage.setItem("isuzu_submissions",JSON.stringify(entries));}
     }
-  }catch(e){ console.log("Sync error:",e); allSubs = getSubs(); }
+  }catch(e){allSubs=getSubs();}
 }
 
-// คืน [{type, typeLabel, stage}] ทั้งหมดของ group
-function getAllStagesForGroup(group){
-  const types = STATION_DATA[group] || {};
-  const result = [];
-  Object.entries(types).forEach(([typeKey, typeData])=>{
-    Object.entries(typeData.stages).forEach(([stageName, subtypes])=>{
-      if(subtypes.length){
-        subtypes.forEach(sub=>{
-          result.push({ type:typeKey, typeLabel:typeData.label, stage: stageName+"-"+sub });
-        });
-      } else {
-        result.push({ type:typeKey, typeLabel:typeData.label, stage: stageName });
-      }
-    });
-  });
-  return result;
-}
-
-function renderDashboard(){
-  const dateVal = document.getElementById("filterDate").value;
-  const subs = allSubs.filter(s=>{
-    const d = String(s.date||"").split("T")[0];
-    const shiftOk = currentShift==="ALL" || s.shift===currentShift;
-    return d===dateVal && s.status==="approved" && shiftOk;
-  });
-
-  document.getElementById("lastUpdate").textContent =
-    "อัปเดต "+new Date().toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
-
-  let totalStages=0, doneCount=0, failCount=0, waitCount=0;
-  const alerts = [];
-
-  const main = document.getElementById("mainContent");
-  main.innerHTML = "";
-
-  Object.keys(STATION_DATA).forEach(group=>{
-    const groupEl = document.createElement("div");
-    groupEl.className = "group-section";
-
-    let groupDone=0, groupFail=0, groupTotal=0;
-    let typesHTML = "";
-
-    const types = STATION_DATA[group];
-    Object.entries(types).forEach(([typeKey, typeData])=>{
-      let typeDone=0, typeFail=0;
-      let stagesHTML = "";
-
-      const allStageNames = [];
-      Object.entries(typeData.stages).forEach(([stageName, subtypes])=>{
-        if(subtypes.length){
-          subtypes.forEach(sub=> allStageNames.push(stageName+"-"+sub));
-        } else {
-          allStageNames.push(stageName);
-        }
-      });
-
-      allStageNames.forEach(stage=>{
-        totalStages++;
-        groupTotal++;
-
-        const stageSubs = subs.filter(s=> s.stage===stage && s.group===group && s.type===typeKey);
-
-        const shifts = currentShift==="ALL" ? ["A","B"] : [currentShift];
-        const shiftResults = shifts.map(sh=>{
-          const sub = stageSubs.find(s=>s.shift===sh);
-          if(!sub) return {sh, status:"wait"};
-          const hasFail = (sub.checks||[]).some(c=>c.result==="fail");
-          return {sh, status:hasFail?"fail":"done", sub};
-        });
-
-        const allWait = shiftResults.every(r=>r.status==="wait");
-        const anyFail = shiftResults.some(r=>r.status==="fail");
-        const anyDone = shiftResults.some(r=>r.status!=="wait");
-
-        let cellClass = "pending";
-        if(anyFail){ cellClass="fail"; groupFail++; typeFail++; failCount++; doneCount++; }
-        else if(!allWait && anyDone){ cellClass="done"; groupDone++; typeDone++; doneCount++; }
-        else if(anyDone){ cellClass="partial"; groupDone++; typeDone++; doneCount++; }
-        else { waitCount++; }
-
-        const latestSub = stageSubs.sort((a,b)=>new Date(b.timestamp_foreman||0)-new Date(a.timestamp_foreman||0))[0];
-        const timeStr = latestSub?.timestamp_foreman
-          ? new Date(latestSub.timestamp_foreman).toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit"})
-          : "";
-
-        const shiftTagsHTML = shiftResults.map(r=>{
-          const cls = r.status==="done"?"shift-done":r.status==="fail"?"shift-fail":"shift-wait";
-          const txt = r.status==="done"?"✓":r.status==="fail"?"✗":"—";
-          return `<span class="shift-tag ${cls}">${r.sh}${txt}</span>`;
-        }).join("");
-
-        shiftResults.filter(r=>r.status==="fail").forEach(r=>{
-          const failNames = (r.sub.checks||[]).filter(c=>c.result==="fail").map(c=>c.name).join(", ");
-          alerts.push({group, type:typeData.label, stage, shift:r.sh, worker:r.sub.worker, failNames, remark:r.sub.remark||""});
-        });
-
-        stagesHTML += `
-          <div class="stage-cell ${cellClass}">
-            ${anyFail?'<div class="fail-dot"></div>':""}
-            <div class="stage-name">${stage}</div>
-            <div class="shift-row">${shiftTagsHTML}</div>
-            ${timeStr?`<div class="stage-time">${timeStr}</div>`:""}
-          </div>`;
-      });
-
-      typesHTML += `
-        <div class="type-wrap">
-          <div class="type-title-bar">
-            <span>${TYPE_ICONS[typeKey]||"📋"}</span>
-            <span>${typeData.label}</span>
-            <span class="type-stats">${typeDone}/${allStageNames.length} ผ่าน ${typeFail>0?`· <span style="color:var(--red)">⚠${typeFail}</span>`:""}</span>
-          </div>
-          <div class="stage-grid">${stagesHTML}</div>
-        </div>`;
-    });
-
-    const isCollapsed = groupCollapsed[group] || false;
-    groupEl.innerHTML = `
-      <div class="group-header" onclick="toggleGroup('${group}')">
-        <span class="group-icon">🏭</span>
-        <span class="group-name">Group ${group}</span>
-        <span class="group-stats">${groupDone}/${groupTotal} · ⚠${groupFail}</span>
-        <span class="group-toggle">${isCollapsed?"▶":"▼"}</span>
-      </div>
-      <div class="group-body ${isCollapsed?"collapsed":""}" id="group-body-${group}">
-        ${typesHTML}
-      </div>`;
-    main.appendChild(groupEl);
-  });
-
-  document.getElementById("sumTotal").textContent = totalStages;
-  document.getElementById("sumDone").textContent = doneCount;
-  document.getElementById("sumFail").textContent = failCount;
-  document.getElementById("sumWait").textContent = waitCount;
-
-  const alertSection = document.getElementById("alertSection");
-  const alertList = document.getElementById("alertList");
-  if(alerts.length){
-    alertSection.style.display="block";
-    alertList.innerHTML = alerts.map(a=>`
-      <div class="alert-box">
-        <div class="alert-title">⚠ Group ${a.group} · ${a.type} · ${a.stage} · SHIFT ${a.shift}</div>
-        <div class="alert-body">Worker: ${a.worker} · ปัญหา: ${a.failNames}${a.remark?` · หมายเหตุ: ${a.remark}`:""}</div>
-      </div>`).join("");
-  } else {
-    alertSection.style.display="none";
-  }
-}
-
-function toggleGroup(id){
-  groupCollapsed[id] = !groupCollapsed[id];
+function setShift(s,btn){
+  currentShift=s;
+  document.querySelectorAll(".fbtn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
   renderDashboard();
 }
 
-function refresh(){
-  syncFromSheets().then(()=>renderDashboard());
-  resetCountdown();
-}
-
+function refresh(){syncFromSheets().then(()=>renderDashboard());resetCountdown();}
 function resetCountdown(){
-  countdown=30;
-  clearInterval(countdownTimer);
-  countdownTimer = setInterval(()=>{
+  countdown=30;clearInterval(countdownTimer);
+  countdownTimer=setInterval(()=>{
     countdown--;
-    document.getElementById("countdownText").textContent=`รีเฟรชอัตโนมัติใน ${countdown} วิ`;
+    document.getElementById("countdownText").textContent=`รีเฟรชใน ${countdown} วิ`;
     if(countdown<=0) refresh();
   },1000);
 }
 
-function exportCSV(){
-  const dateVal = document.getElementById("filterDate").value;
-  const subs = allSubs.filter(s=>{
-    const d = String(s.date||"").split("T")[0];
-    const shiftOk = currentShift==="ALL" || s.shift===currentShift;
-    return d===dateVal && s.status==="approved" && shiftOk;
-  });
-  if(!subs.length){ alert("ไม่มีข้อมูลในวันที่เลือก"); return; }
+function renderDashboard(){
+  const dateVal=document.getElementById("filterDate").value;
+  const shifts=currentShift==="ALL"?["A","B"]:[currentShift];
+  document.getElementById("lastUpdate").textContent=
+    new Date().toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
 
-  let csv = "\uFEFF";
-  csv += "วันที่,กะ,Group,ประเภท,Stage,Worker,Foreman,เวลาส่ง,เวลาอนุมัติ,ผ่าน,ไม่ผ่าน,รายการไม่ผ่าน,หมายเหตุ\n";
-  subs.forEach(s=>{
-    const checks=s.checks||[];
-    const passC=checks.filter(c=>c.result==="pass").length;
-    const failC=checks.filter(c=>c.result==="fail").length;
-    const failNames=checks.filter(c=>c.result==="fail").map(c=>c.name).join("; ");
-    const tw=s.timestamp_worker?new Date(s.timestamp_worker).toLocaleString("th-TH"):"";
-    const tf=s.timestamp_foreman?new Date(s.timestamp_foreman).toLocaleString("th-TH"):"";
-    csv+=`${s.date||""},${s.shift||""},${s.group||""},${s.type_label||s.type||""},${s.stage||""},${s.worker||""},${s.foreman||""},${tw},${tf},${passC},${failC},"${failNames}","${(s.remark||"").replace(/"/g,"'")}"\n`;
+  const subs=allSubs.filter(s=>{
+    const d=String(s.date||"").split("T")[0];
+    const shiftOk=currentShift==="ALL"||s.shift===currentShift;
+    return d===dateVal&&s.status==="approved"&&shiftOk;
   });
-  const blob=new Blob([csv],{type:"text/csv;charset=utf-8;"});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement("a");
-  a.href=url; a.download=`ISUZU_Report_${dateVal}.csv`; a.click();
-  URL.revokeObjectURL(url);
+
+  // รวม stats ทุก group ตาม type
+  const typeStats={};
+  let totalAll=0,passAll=0,failAll=0;
+  const alerts=[];
+
+  Object.keys(STATION_DATA).forEach(group=>{
+    Object.entries(STATION_DATA[group]).forEach(([typeKey,typeData])=>{
+      if(!typeStats[typeKey]) typeStats[typeKey]={total:0,pass:0,fail:0,wait:0};
+      const stages=getAllStages(group,typeKey);
+      stages.forEach(stage=>{
+        totalAll++;typeStats[typeKey].total++;
+        const stageSubs=subs.filter(s=>s.stage===stage&&s.group===group&&s.type===typeKey);
+        const anyDone=stageSubs.length>0;
+        const anyFail=stageSubs.some(s=>(s.checks||[]).some(c=>c.result==="fail"));
+        if(anyFail){typeStats[typeKey].fail++;failAll++;passAll++;}
+        else if(anyDone){typeStats[typeKey].pass++;passAll++;}
+        else typeStats[typeKey].wait++;
+        if(anyFail){
+          const sub=stageSubs[0];
+          const failItems=(sub.checks||[]).filter(c=>c.result==="fail").map(c=>{
+            let t=c.name;if(c.value)t+=" ["+c.value+"]";return t;
+          });
+          alerts.push({group,type:TYPE_META[typeKey]?.label||typeKey,stage,worker:sub.worker,failItems});
+        }
+      });
+    });
+  });
+
+  document.getElementById("sTotal").textContent=totalAll;
+  document.getElementById("sPass").textContent=passAll;
+  document.getElementById("sFail").textContent=failAll;
+  document.getElementById("sWait").textContent=totalAll-passAll;
+
+  // alerts
+  const alertArea=document.getElementById("alertArea");
+  if(alerts.length){
+    alertArea.innerHTML=alerts.slice(0,5).map(a=>`
+      <div class="alert-box">
+        <div class="alert-title">⚠ ${a.type} — ${a.stage} (Group ${a.group})</div>
+        <div class="alert-body">Worker: ${a.worker} · ปัญหา: ${a.failItems.join(", ")}</div>
+      </div>`).join("")+(alerts.length>5?`<div style="text-align:center;font-size:12px;color:var(--red);padding:6px 0;font-weight:700;">และอีก ${alerts.length-5} รายการ...</div>`:"");
+  } else alertArea.innerHTML="";
+
+  // type cards (หน้าหลัก)
+  const grid=document.getElementById("typeGrid");
+  grid.innerHTML="";
+
+  // เรียงประเภทที่มีข้อมูลในระบบ
+  const typeKeys=Object.keys(typeStats);
+  typeKeys.forEach(typeKey=>{
+    const st=typeStats[typeKey];
+    const meta=TYPE_META[typeKey]||{label:typeKey,icon:"📋"};
+    const done=st.pass+st.fail;
+    let cls="",badge="",badgeCls="";
+    if(st.fail>0){cls="tc-fail";badge="⚠ พบปัญหา";badgeCls="";}
+    else if(done===st.total&&st.total>0){cls="tc-pass";badge="ผ่าน";badgeCls="";}
+    else if(done>0){cls="tc-warn";badge="ผ่านบางส่วน";badgeCls="";}
+    else{badge="รอตรวจ";badgeCls="";}
+
+    const card=document.createElement("div");
+    card.className="tc "+(cls||"");
+    card.innerHTML=`
+      ${st.fail>0?`<div class="fail-dot">${st.fail}</div>`:""}
+      <div class="tc-icon">${meta.icon}</div>
+      <div class="tc-name">${meta.label}</div>
+      <div class="tc-ratio">${done}/${st.total}</div>
+      <div class="tc-badge">${badge}</div>
+    `;
+    card.onclick=()=>openModal(typeKey,meta,subs,shifts);
+    grid.appendChild(card);
+  });
+}
+
+// MODAL: แสดงรายละเอียดแยก Group → Stage
+function openModal(typeKey,meta,subs,shifts){
+  document.getElementById("drawerTitle").textContent=meta.icon+" "+meta.label;
+
+  let totalPass=0,totalFail=0,totalAll=0;
+  const bodyEl=document.getElementById("drawerBody");
+  bodyEl.innerHTML="";
+
+  Object.keys(STATION_DATA).forEach(group=>{
+    if(!STATION_DATA[group][typeKey]) return;
+    const stages=getAllStages(group,typeKey);
+    if(!stages.length) return;
+
+    let gPass=0,gFail=0;
+    const stageResults=[];
+
+    stages.forEach(stage=>{
+      totalAll++;
+      const stageSubs=subs.filter(s=>s.stage===stage&&s.group===group&&s.type===typeKey);
+      const anyFail=stageSubs.some(s=>(s.checks||[]).some(c=>c.result==="fail"));
+      const anyDone=stageSubs.length>0;
+      let status="wait";
+      if(anyFail){status="fail";gFail++;totalFail++;}
+      else if(anyDone){status="pass";gPass++;totalPass++;}
+      const bestSub=stageSubs.sort((a,b)=>new Date(b.timestamp_foreman||0)-new Date(a.timestamp_foreman||0))[0];
+      stageResults.push({stage,status,sub:bestSub});
+    });
+
+    // group header
+    const grpEl=document.createElement("div");
+    grpEl.className="group-row";
+    const pct=stages.length>0?Math.round((gPass+gFail)/stages.length*100):0;
+    const grpColor=gFail>0?"var(--red)":gPass+gFail===stages.length?"var(--pass)":"var(--warn)";
+    grpEl.innerHTML=`
+      <div class="group-label">
+        🏭 Group ${group}
+        <div class="group-prog"><div class="group-prog-fill" style="width:${pct}%;background:${grpColor}"></div></div>
+        <span class="group-pct">${gPass+gFail}/${stages.length}</span>
+      </div>`;
+
+    // stage list — fail ก่อน pass แล้ว wait
+    const listEl=document.createElement("div");
+    listEl.className="stage-list";
+    const sorted=[
+      ...stageResults.filter(r=>r.status==="fail"),
+      ...stageResults.filter(r=>r.status==="pass"),
+      ...stageResults.filter(r=>r.status==="wait"),
+    ];
+    sorted.forEach(r=>{
+      const cls=r.status==="pass"?"si-pass":r.status==="fail"?"si-fail":"";
+      const dotCls=r.status==="pass"?"dp":r.status==="fail"?"df":"dw";
+      const tagCls=r.status==="pass"?"tp":r.status==="fail"?"tf":"tw";
+      const tagTxt=r.status==="pass"?"✓ ผ่าน":r.status==="fail"?"⚠ ไม่ผ่าน":"รอตรวจ";
+      const si=document.createElement("div");
+      si.className="si "+cls;
+
+      const checks=r.sub?(r.sub.checks||[]):[];
+      let checksHTML="";
+      if(checks.length&&r.status!=="wait"){
+        checksHTML=`<div class="si-checks">`+
+          checks.map(c=>`<div class="ck ${c.result==="fail"?"ck-fail":""}">
+            <span>${c.name}</span>
+            <span class="ck-val">${c.value?c.value+" · ":""}<span style="color:${c.result==="pass"?"var(--pass)":"var(--red)"}">${c.result==="pass"?"O":"✗"}</span></span>
+          </div>`).join("")+
+          (r.sub?`<div class="si-meta">👷 ${r.sub.worker||""} · ✅ ${r.sub.foreman||"-"}</div>`:"")
+          +`</div>`;
+      }
+      si.innerHTML=`
+        <div class="si-header">
+          <div class="si-dot ${dotCls}"></div>
+          <div class="si-name">${r.stage}</div>
+          <span class="si-tag ${tagCls}">${tagTxt}</span>
+        </div>${checksHTML}`;
+      listEl.appendChild(si);
+    });
+
+    grpEl.appendChild(listEl);
+    bodyEl.appendChild(grpEl);
+  });
+
+  document.getElementById("drawerSub").textContent=
+    `${totalPass}/${totalAll} ผ่าน · ${totalFail} พบปัญหา`;
+  document.getElementById("overlay").classList.add("show");
+  document.body.style.overflow="hidden";
+}
+
+function closeModal(){
+  document.getElementById("overlay").classList.remove("show");
+  document.body.style.overflow="";
+}
+function tryClose(e){if(e.target===document.getElementById("overlay"))closeModal();}
+
+function exportCSV(){
+  const dateVal=document.getElementById("filterDate").value;
+  const subs=allSubs.filter(s=>String(s.date||"").split("T")[0]===dateVal&&s.status==="approved");
+  if(!subs.length){alert("ไม่มีข้อมูล");return;}
+  let csv="\uFEFF";
+  csv+="วันที่,กะ,Group,ประเภท,Stage,Worker,Foreman,ผ่าน,ไม่ผ่าน,รายการไม่ผ่าน,หมายเหตุ\n";
+  subs.forEach(s=>{
+    const c=s.checks||[];
+    const fn=c.filter(x=>x.result==="fail").map(x=>x.name).join("; ");
+    csv+=`${s.date},${s.shift},${s.group},${s.type_label||s.type},${s.stage},${s.worker},${s.foreman||""},${c.filter(x=>x.result==="pass").length},${c.filter(x=>x.result==="fail").length},"${fn}","${(s.remark||"").replace(/"/g,"'")}"\n`;
+  });
+  const b=new Blob([csv],{type:"text/csv;charset=utf-8;"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=`ISUZU_${dateVal}.csv`;a.click();
 }
 
 syncFromSheets().then(()=>renderDashboard());
