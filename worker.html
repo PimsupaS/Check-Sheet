@@ -29,13 +29,11 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 .nav-title{font-size:15px;font-weight:700;}
 .nav-sub{font-size:12px;color:var(--muted);margin-top:2px;}
 .nav-arrow{font-size:20px;color:var(--red);font-weight:700;flex-shrink:0;}
-/* sub-type selector chips */
 .subtype-row{display:flex;gap:8px;flex-wrap:wrap;margin:0 14px;}
 .subtype-chip{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:12px 16px;font-size:14px;font-weight:600;cursor:pointer;flex:1;text-align:center;min-width:100px;transition:all .15s;}
 .subtype-chip:active{transform:scale(.97);}
 .subtype-chip.active{background:var(--red);border-color:var(--red);color:#fff;}
-/* Check form */
-.meta-card{background:var(--card);margin:0 14px;border-radius:0 0 12px 12px;box-shadow:var(--shadow);padding:12px 14px;display:grid;grid-template-columns:1fr 1fr;gap:10px;border-top:1px solid var(--border);}
+.meta-card{background:var(--card);margin:0 14px;border-radius:12px;box-shadow:var(--shadow);padding:12px 14px;display:grid;grid-template-columns:1fr 1fr;gap:10px;border:1px solid var(--border);}
 .meta-item label{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:3px;}
 .meta-item input,.meta-item select{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;font-family:'Sarabun',sans-serif;font-size:14px;background:#F9FAFB;outline:none;transition:border-color .15s;}
 .meta-item input:focus,.meta-item select:focus{border-color:var(--red);background:#fff;}
@@ -124,7 +122,7 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
   </div>
 </div>
 
-<!-- PAGE 4: เลือกประเภทย่อย (ถ้ามี) -->
+<!-- PAGE 4: เลือกรายละเอียด -->
 <div class="page" id="page-subtype">
   <div class="section">
     <div class="section-title">เลือกรายละเอียด</div>
@@ -134,7 +132,7 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 
 <!-- PAGE 5: กรอกแบบฟอร์ม -->
 <div class="page" id="page-form">
-  <div class="meta-card">
+  <div class="meta-card" style="margin-top: 14px;">
     <div class="meta-item"><label>วันที่</label><input type="date" id="inputDate"></div>
     <div class="meta-item">
       <label>กะทำงาน</label>
@@ -184,9 +182,6 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 <script>
 const SHEETS_URL = "https://script.google.com/macros/s/AKfycbxFpwj3ZzsQK6CbbyiS-kyuiFPQd_3dNge_VE_7qgjxs5JsbaUN6eGjYkEXS7UfC6Mk/exec";
 
-// ============================================================
-// STATION DATA: Group -> ประเภทหลัก -> Stage -> [ประเภทย่อย]
-// ============================================================
 const STATION_DATA = {
   FRC: {
     CO2: { label:"เครื่องเชื่อม CO2", stages:{
@@ -194,23 +189,16 @@ const STATION_DATA = {
       "CP1-04": ["FRT-LH", "RR-LH", "FRT-RH", "RR-RH"],
       "CP1-05": ["FRT-LH", "RR-LH", "FRT-RH", "RR-RH"],
     }},
-    JIG: { label:"JIG", stages:{
-      "CP1-02": [], "CP1-03": [], "CP1-04": [], "CP1-05": [],
-    }},
-    AIR: { label:"AIR SERVICE UNIT", stages:{
-      "CP1-02": [], "CP1-03": [], "CP1-04": [], "CP1-05": [],
-    }},
+    JIG: { label:"JIG", stages:{ "CP1-02": [], "CP1-03": [], "CP1-04": [], "CP1-05": [] }},
+    AIR: { label:"AIR SERVICE UNIT", stages:{ "CP1-02": [], "CP1-03": [], "CP1-04": [], "CP1-05": [] }},
     FANUC: { label:"หุ่นยนต์ FANUC", stages:{
-      "CP1-03-LH": ["no.1", "no.3", "no.5"],
-      "CP1-03-RH": ["no.2", "no.4", "no.6"],
+      "CP1-03-LH": ["no.1", "no.3", "no.5"], "CP1-03-RH": ["no.2", "no.4", "no.6"],
     }},
     CONTACT_TIP: { label:"CONTACT TIP", stages:{ "CP1-03": ["W1","W2","W3","W4","W5","W6"] }},
   },
   FRF: {
     HOIST: { label:"ELECTRIC HOIST", stages:{ "SA1-01": [] }},
-    CO2: { label:"เครื่องเชื่อม CO2", stages:{
-      "SA1-02": [], "MA1-7.5": ["LH", "RH"], "MA1-09": ["LH", "RH"],
-    }},
+    CO2: { label:"เครื่องเชื่อม CO2", stages:{ "SA1-02": [], "MA1-7.5": ["LH", "RH"], "MA1-09": ["LH", "RH"] }},
     JIG: { label:"JIG", stages:{
       "SA1-01": [], "SA1-02": [], "MA1-00": [], "MA1-02": [],
       "MA1-04": [], "MA1-06": [], "MA1-07": [], "MA1-09": [],
@@ -223,57 +211,41 @@ const STATION_DATA = {
       "SA1-01": [], "SA1-02": [], "MA1-02": [],
       "MA1-04": ["No.2/4/6", "No.1/3/5"], "MA1-06": [],
     }},
-    CONTACT_TIP: { label:"CONTACT TIP", stages:{
-      "MA1-02": ["W1","W2","W3","W4"], "MA1-04": ["W1","W2","W3","W4","W5","W6"], "MA1-06": ["W1","W2","W3","W4"], "SA1-01": ["W1","W2"], "SA1-02": ["W1","W2"],
-    }},
+    CONTACT_TIP: { label:"CONTACT TIP", stages:{ "MA1-02": ["W1","W2","W3","W4"], "MA1-04": ["W1","W2","W3","W4","W5","W6"], "MA1-06": ["W1","W2","W3","W4"], "SA1-01": ["W1","W2"], "SA1-02": ["W1","W2"] }},
   },
   FRR: {
     HOIST: { label:"ELECTRIC HOIST", stages:{ "SC1-01": [] }},
-    CO2: { label:"เครื่องเชื่อม CO2", stages:{
-      "MC1-8.5": ["LH", "RH"], "MC1-10": ["LH", "RH"],
-    }},
+    CO2: { label:"เครื่องเชื่อม CO2", stages:{ "MC1-8.5": ["LH", "RH"], "MC1-10": ["LH", "RH"] }},
     JIG: { label:"JIG", stages:{
       "SC1-01": [], "SC1-02": [], "MC1-01": [], "MC1-02": [],
       "MC1-04": [], "MC1-05": [], "MC1-07": [], "MC1-08": [], "MC1-10": [],
     }},
     AIR: { label:"AIR SERVICE UNIT", stages:{
       "SC1-01": [], "SC1-02": [], "MC1-01,02": [], "MC1-04": [],
-      "MC1-05": [], "MC1-07,08": [],
-      "MC1-8.5": ["H8", "H7"], "MC1-10": ["H9", "H10", "Jig", "Lifter"],
+      "MC1-05": [], "MC1-07,08": [], "MC1-8.5": ["H8", "H7"], "MC1-10": ["H9", "H10", "Jig", "Lifter"],
     }},
     YASKAWA: { label:"หุ่นยนต์ YASKAWA", stages:{
       "SC1-01": [], "SC1-02": [], "MC1-02": [],
       "MC1-04": ["No.2/4/6"], "MC1-05": ["No.1/3/5"], "MC1-07": [],
     }},
-    CONTACT_TIP: { label:"CONTACT TIP", stages:{
-      "SC1-01": ["W1","W2","W3"], "SC1-02": ["W1","W2","W3"], "MC1-02": ["W1","W2","W3","W4"], "MC1-04": ["W1","W2","W3","W4"], "MC1-05": ["W1","W2","W3","W4"], "MC1-07": ["W1","W2"],
-    }},
+    CONTACT_TIP: { label:"CONTACT TIP", stages:{ "SC1-01": ["W1","W2","W3"], "SC1-02": ["W1","W2","W3"], "MC1-02": ["W1","W2","W3","W4"], "MC1-04": ["W1","W2","W3","W4"], "MC1-05": ["W1","W2","W3","W4"], "MC1-07": ["W1","W2"] }},
   },
   FRU: {
     HOIST: { label:"ELECTRIC HOIST", stages:{ "SA2-01": [] }},
-    CO2: { label:"เครื่องเชื่อม CO2", stages:{
-      "MA2-07": ["LH", "RH"], "MA2-09": ["LH", "RH"],
-    }},
+    CO2: { label:"เครื่องเชื่อม CO2", stages:{ "MA2-07": ["LH", "RH"], "MA2-09": ["LH", "RH"] }},
     JIG: { label:"JIG", stages:{
-      "SA2-01": [], "SA2-02": [], "MA2-01": [], "MA2-02": [],
-      "MA2-04": [], "MA2-06": [], "MA2-09": [],
+      "SA2-01": [], "SA2-02": [], "MA2-01": [], "MA2-02": [], "MA2-04": [], "MA2-06": [], "MA2-09": [],
     }},
     AIR: { label:"AIR SERVICE UNIT", stages:{
       "SA2-01&02": [], "MA2-01&02": [], "MA2-04": [], "MA2-06": [],
       "MA2-09": ["H8", "H9"],
     }},
-    FANUC: { label:"หุ่นยนต์ FANUC", stages:{
-      "SA2-01,02": [], "MA2-02": [], "MA2-04": [], "MA2-06": [],
-    }},
-    CONTACT_TIP: { label:"CONTACT TIP", stages:{
-      "MA2-02": ["W1","W2","W3","W4"], "MA2-04": ["W1","W2","W3","W4","W5","W6"], "MA2-06": ["W1","W2","W3","W4"], "SA2-01": ["W1","W2"], "SA2-02": ["W1","W2"],
-    }},
+    FANUC: { label:"หุ่นยนต์ FANUC", stages:{ "SA2-01,02": [], "MA2-02": [], "MA2-04": [], "MA2-06": [] }},
+    CONTACT_TIP: { label:"CONTACT TIP", stages:{ "MA2-02": ["W1","W2","W3","W4"], "MA2-04": ["W1","W2","W3","W4","W5","W6"], "MA2-06": ["W1","W2","W3","W4"], "SA2-01": ["W1","W2"], "SA2-02": ["W1","W2"] }},
   },
   FRX: {
     HOIST: { label:"ELECTRIC HOIST", stages:{ "SC2-01": [] }},
-    CO2: { label:"เครื่องเชื่อม CO2", stages:{
-      "SC2-02": [], "MC2-08": ["LH", "RH"], "MC2-10": ["LH", "RH"],
-    }},
+    CO2: { label:"เครื่องเชื่อม CO2", stages:{ "SC2-02": [], "MC2-08": ["LH", "RH"], "MC2-10": ["LH", "RH"] }},
     JIG: { label:"JIG", stages:{
       "SC2-01": ["RG2u-RJ2u"], "SC2-02": ["RG2u-RJ2u"],
       "MC2-01": [], "MC2-02": [], "MC2-04": [], "MC2-05": [], "MC2-07": [], "MC2-10": [],
@@ -291,19 +263,11 @@ const STATION_DATA = {
   },
   FXC: {
     CO2: { label:"เครื่องเชื่อม CO2", stages:{
-      "CP2-02": ["007", "008", "009", "010"],
-      "CP2-04": ["011", "012", "013", "014"],
-      "CP2-05": ["015", "016", "017", "018"],
+      "CP2-02": ["007", "008", "009", "010"], "CP2-04": ["011", "012", "013", "014"], "CP2-05": ["015", "016", "017", "018"],
     }},
-    JIG: { label:"JIG", stages:{
-      "CP2-02": [], "CP2-03": [], "CP2-04": [], "CP2-05": [],
-    }},
-    AIR: { label:"AIR SERVICE UNIT", stages:{
-      "CP2-02": [], "CP2-03": [], "CP2-04": [], "CP2-05": [],
-    }},
-    FANUC: { label:"หุ่นยนต์ FANUC", stages:{
-      "CP2-03": ["NO.1", "NO.3", "NO.5", "NO.2", "NO.4", "NO.6"],
-    }},
+    JIG: { label:"JIG", stages:{ "CP2-02": [], "CP2-03": [], "CP2-04": [], "CP2-05": [] }},
+    AIR: { label:"AIR SERVICE UNIT", stages:{ "CP2-02": [], "CP2-03": [], "CP2-04": [], "CP2-05": [] }},
+    FANUC: { label:"หุ่นยนต์ FANUC", stages:{ "CP2-03": ["NO.1", "NO.3", "NO.5", "NO.2", "NO.4", "NO.6"] }},
     CONTACT_TIP: { label:"CONTACT TIP", stages:{ "CP2-03": ["W1","W2","W3","W4","W5","W6"] }},
   },
 };
@@ -313,13 +277,11 @@ const TYPE_ICONS = {
   FANUC: "🤖", YASKAWA: "🤖", CONTACT_TIP: "🔌",
 };
 
-// รายการตรวจพื้นฐาน (ใช้กับประเภทที่ยังไม่มีรายการเฉพาะ)
 const DEFAULT_CHECKS = [
   {id:1,name:"พื้นที่รอบๆ บริเวณ",  method:"สายตา", standard:"ไม่มีสิ่งของที่ไม่จำเป็นวางอยู่"},
-  {id:2,name:"สภาพทั่วไป",           method:"สายตา, สัมผัส", standard:"อยู่ในสภาพดี ไม่มีความผิดปกติ"},
+  {id:2,name:"สภาพทั่วไป",          method:"สายตา, สัมผัส", standard:"อยู่ในสภาพดี ไม่มีความผิดปกติ"},
 ];
 
-// รายการตรวจเฉพาะของเครื่องเชื่อม CO2 (ใช้กับทุก Stage ทุก Group ที่เป็นประเภท CO2)
 const CO2_CHECKS = [
   {id:1, name:"จุดต่อสายไฟเข้าและออกจากเครื่อง", method:"สัมผัส, สายตา", standard:"ไม่หลวม, ไม่แตกร้าว"},
   {id:2, name:"การทำงานของเครื่อง",               method:"ประสาทสัมผัส", standard:"ไม่สั่น, ไม่มีเสียงหรือกลิ่น"},
@@ -333,27 +295,24 @@ const CO2_CHECKS = [
   {id:10,name:"อัตราการไหลแก๊ส CO2",             method:"สายตา", standard:"26-30 Lite/minute", numeric:true, unit:"L/min", min:26, max:30},
 ];
 
-// รายการตรวจเฉพาะของ JIG
 const JIG_CHECKS = [
   {id:1, name:"พื้นที่รอบๆ บริเวณ JIG",               method:"สายตา",                standard:"ไม่มีสิ่งของที่ไม่จำเป็นวางอยู่"},
-  {id:2, name:"สภาพทั่วไปของ CLAMP",                   method:"สายตา, สัมผัส",        standard:"ไม่หลวมคลอน"},
-  {id:3, name:"ไกด์ประคองชิ้นส่วน",                   method:"สายตา, สัมผัส",        standard:"ไม่โยก, ไม่หลวมคลอน"},
+  {id:2, name:"สภาพทั่วไปของ CLAMP",                    method:"สายตา, สัมผัส",        standard:"ไม่หลวมคลอน"},
+  {id:3, name:"ไกด์ประคองชิ้นส่วน",                    method:"สายตา, สัมผัส",        standard:"ไม่โยก, ไม่หลวมคลอน"},
   {id:4, name:"PIN, DATUM",                             method:"สายตา, สัมผัส",        standard:"ไม่มี SPATTER ติด, ไม่หลวมหรือสึกหรอ"},
   {id:5, name:"PROXIMITY, PHOTO SENSOR, LIMIT SWITCH, POKAYOKE", method:"สายตา, สัมผัสเหล็กเช็ค Pokayoke", standard:"มีไฟติด, ไม่หลวมคลอน"},
   {id:6, name:"สภาพสายลม, กระบอกลม",                  method:"สายตา, ฟังเสียง",      standard:"ไม่แตก, ไม่มีเสียงลมรั่ว"},
 ];
 
-// รายการตรวจเฉพาะของหุ่นยนต์ FANUC
 const FANUC_CHECKS = [
   {id:1, name:"สภาพทั่วไปหัว TORCH",                  method:"สายตา, สัมผัส",  standard:"ไม่โยก, ไม่หลวมคลอน"},
   {id:2, name:"คอนแทคทิป, นอสเซิล, ทิปบอดี้",        method:"สายตา",          standard:"ไม่มี Spatter ติด, ไม่แตกร้าว"},
   {id:3, name:"TEACH PENDANT",                          method:"สายตา",          standard:"สวิทช์อยู่โหมด AUTO, SPEED RATIO 100%"},
   {id:4, name:"แรงกดลวด",                              method:"สายตา",          standard:"แรงกดลวดอยู่ที่ค่า 2-4"},
   {id:5, name:"อัตราการไหลแก๊ส",                      method:"สายตา",          standard:"26-30 Lite/minute", numeric:true, unit:"L/min", min:26, max:30},
-  {id:6, name:"น้ำยาล้างหัว ROBOT",                   method:"สายตา",          standard:"ไม่แห้ง หรือ หมดจากภาชนะ"},
+  {id:6, name:"น้ำยาล้างหัว ROBOT",                    method:"สายตา",          standard:"ไม่แห้ง หรือ หมดจากภาชนะ"},
 ];
 
-// รายการตรวจเฉพาะของ AIR SERVICE UNIT
 const AIR_CHECKS = [
   {id:1, name:"AIR FILTER (ตัวกรอง)",                          method:"สายตา",              standard:"ไม่มีน้ำหรือเศษผงอยู่ในถ้วยดักน้ำ"},
   {id:2, name:"AIR PRESSURE (ค่าแรงดันลม)",                    method:"สายตา",              standard:"0.45-0.55 Mpa", numeric:true, unit:"Mpa", min:0.45, max:0.55},
@@ -363,7 +322,6 @@ const AIR_CHECKS = [
   {id:6, name:"สายไฟส่งสัญญาณเช็คค่าแรงดันลม",               method:"สายตา, สัมผัส",      standard:"ไม่ถลอก, ไม่แตกชำรุด"},
 ];
 
-// รายการตรวจเฉพาะของ ELECTRIC HOIST
 const HOIST_CHECKS = [
   {id:1, name:"สภาพปุ่มกด, สายไฟ",                                        method:"สายตา",        standard:"ไม่ชำรุด, ปุ่มไม่แตก"},
   {id:2, name:"สภาพตะขอ",                                                  method:"สายตา",        standard:"ไม่มีรอยแตกร้าว, HOOK LATCH ใช้งานได้"},
@@ -374,20 +332,12 @@ const HOIST_CHECKS = [
   {id:7, name:"Spring balancer",                                            method:"ดึงขึ้น-ลง",    standard:"วิ่งขึ้น-ลงราบเรียบ"},
 ];
 
-// แมประหว่างประเภทหลัก -> รายการตรวจที่ใช้
 const CHECKS_BY_TYPE = {
-  CO2: CO2_CHECKS,
-  JIG: JIG_CHECKS,
-  FANUC: FANUC_CHECKS,
-  YASKAWA: FANUC_CHECKS,
-  AIR: AIR_CHECKS,
-  HOIST: HOIST_CHECKS,
-  CONTACT_TIP: "CONTACT_TIP_SPECIAL", // รูปแบบพิเศษ: กด "เปลี่ยนแล้ว" หรือ "ยังไม่เปลี่ยน" ต่อ W
+  CO2: CO2_CHECKS, JIG: JIG_CHECKS, FANUC: FANUC_CHECKS,
+  YASKAWA: FANUC_CHECKS, AIR: AIR_CHECKS, HOIST: HOIST_CHECKS,
+  CONTACT_TIP: "CONTACT_TIP_SPECIAL",
 };
 
-// ============================================================
-// STATE
-// ============================================================
 let nav = { group:null, type:null, stage:null, subtype:null };
 let checkState = {};
 let currentChecks = [];
@@ -397,14 +347,12 @@ document.getElementById("inputDate").value = today.toISOString().split("T")[0];
 const h = today.getHours();
 document.getElementById("inputShift").value = (h>=18||h<6)?"B":"A";
 
-// ============================================================
-// NAVIGATION
-// ============================================================
 function showPage(id){
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
-  document.getElementById("page-"+id).classList.add("active");
+  const targetPage = document.getElementById("page-"+id);
+  if(targetPage) targetPage.classList.add("active");
   document.getElementById("successScreen").classList.remove("show");
-  document.getElementById("page-form").style.display = "";
+  document.getElementById("page-form").style.display = (id === "form") ? "block" : "";
   window.scrollTo(0,0);
 }
 
@@ -455,10 +403,22 @@ function getSubtypes(){
 }
 
 function goBack(){
-  if(nav.subtype !== null && getSubtypes().length){ nav.subtype=null; updateHeader(); renderStages(); showPage("stage"); }
-  else if(nav.stage){ nav.stage=null; nav.subtype=null; updateHeader(); renderTypes(); showPage("type"); }
-  else if(nav.type){ nav.type=null; nav.stage=null; updateHeader(); renderGroups(); showPage("group"); }
-  else if(nav.group){ nav.group=null; updateHeader(); renderGroups(); showPage("group"); }
+  const activePage = document.querySelector(".page.active");
+  if(activePage && activePage.id === "page-form") {
+    if(getSubtypes().length) {
+      nav.subtype = null; updateHeader(); renderSubtypes(); showPage("subtype");
+    } else {
+      nav.stage = null; updateHeader(); renderStages(); showPage("stage");
+    }
+  } else if(nav.subtype !== null && getSubtypes().length){ 
+    nav.subtype=null; updateHeader(); renderSubtypes(); showPage("subtype"); 
+  } else if(nav.stage){ 
+    nav.stage=null; nav.subtype=null; updateHeader(); renderStages(); showPage("stage"); 
+  } else if(nav.type){ 
+    nav.type=null; nav.stage=null; updateHeader(); renderTypes(); showPage("type"); 
+  } else if(nav.group){ 
+    nav.group=null; updateHeader(); renderGroups(); showPage("group"); 
+  }
 }
 
 function goHome(){
@@ -470,9 +430,6 @@ function goHome(){
   showPage("group");
 }
 
-// ============================================================
-// RENDER NAVIGATION
-// ============================================================
 function renderGroups(){
   const grid = document.getElementById("groupGrid");
   grid.innerHTML="";
@@ -512,7 +469,6 @@ function renderStages(){
     el.onclick=()=>{
       nav.stage=stageName; nav.subtype=null;
       updateHeader();
-      // CONTACT_TIP แสดง W ทั้งหมดในฟอร์มเลย ไม่ผ่านหน้า subtype
       if(nav.type==="CONTACT_TIP"){ initForm(); showPage("form"); return; }
       const subs = getSubtypes();
       if(subs.length){ renderSubtypes(); showPage("subtype"); }
@@ -534,26 +490,17 @@ function renderSubtypes(){
   });
 }
 
-// ============================================================
-// FORM
-// ============================================================
 function isContactTip(){ return nav.type === "CONTACT_TIP"; }
 
 function getContactTipItems(){
-  // สร้างรายการ W จาก subtype ที่เลือกอยู่
-  // nav.stage = "CP1-03-W1" (รวม subtype แล้ว) แต่ตอน CONTACT_TIP
-  // เราเลือก Stage แล้ว subtype = W1..Wn รวมทั้งหมดใน stage นั้น
-  const baseStage = nav.stage; // เช่น "CP1-03"
-  const subs = STATION_DATA[nav.group]["CONTACT_TIP"].stages[baseStage] || [];
-  return subs; // ["W1","W2",...]
+  return STATION_DATA[nav.group]["CONTACT_TIP"].stages[nav.stage] || [];
 }
 
 function initForm(){
   if(isContactTip()){
-    // CONTACT_TIP: state เก็บจำนวนครั้งที่เปลี่ยน เช่น {W1: null, W2: 2, ...} null=ยังไม่กรอก
     currentChecks = [];
     checkState = {};
-    getContactTipItems().forEach(w=>{ checkState[w] = null; }); // null=ยังไม่กรอก
+    getContactTipItems().forEach(w=>{ checkState[w] = null; });
   } else {
     currentChecks = CHECKS_BY_TYPE[nav.type] || DEFAULT_CHECKS;
     checkState={};
@@ -566,7 +513,6 @@ function renderChecks(){
   const list=document.getElementById("checkList");
   list.innerHTML="";
 
-  // ===== CONTACT TIP MODE =====
   if(isContactTip()){
     const items = getContactTipItems();
     if(!items.length){
@@ -599,7 +545,6 @@ function renderChecks(){
     return;
   }
 
-  // ===== NORMAL MODE =====
   currentChecks.forEach(c=>{
     const s=checkState[c.id];
     const div=document.createElement("div");
@@ -642,10 +587,8 @@ function renderChecks(){
   updateProgress();
 }
 
-
 function setCTVal(w, val){
   checkState[w] = val === "" ? null : val;
-  // อัปเดตสีกรอบแบบ in-place ไม่ re-render (กัน focus หลุด)
   const row = document.querySelector(`.ct-row[data-ct="${w}"]`);
   if(row){
     row.classList.remove("ct-done","ct-zero");
@@ -658,12 +601,12 @@ function setCTVal(w, val){
 
 function setR(id,v){checkState[id].result=checkState[id].result===v?null:v;if(checkState[id].result!=="fail")checkState[id].comment="";renderChecks();}
 function setC(id,v){checkState[id].comment=v;}
+
 let _vDebounceTimers = {};
 function setVQuiet(id,v){
-  // เก็บค่าทันที (ไม่ re-render) แล้วรอ debounce ก่อนตัดสิน pass/fail
   checkState[id].value = v;
   clearTimeout(_vDebounceTimers[id]);
-  _vDebounceTimers[id] = setTimeout(()=>{ setV(id, v); }, 1000);
+  _vDebounceTimers[id] = setTimeout(()=>{ setV(id, v); }, 800);
 }
 
 function setV(id,v){
@@ -674,30 +617,26 @@ function setV(id,v){
   if(c && c.numeric){
     if(v===""){
       checkState[id].result = null;
+      needsCommentBox = true;
     } else {
       const num = parseFloat(v);
       if(!isNaN(num)){
         const prevResult = checkState[id].result;
         checkState[id].result = (num>=c.min && num<=c.max) ? "pass" : "fail";
         if(checkState[id].result!=="fail") checkState[id].comment="";
-        needsCommentBox = (checkState[id].result !== prevResult); // ต้อง re-render เฉพาะถ้าสถานะเปลี่ยนจริง (fail<->pass) เพื่อโชว์/ซ่อนช่อง comment
+        needsCommentBox = (checkState[id].result !== prevResult);
       }
     }
   }
 
   if(needsCommentBox){
-    // re-render แค่ตอนจำเป็น (สถานะเปลี่ยนจาก pass<->fail) แต่คง focus ไว้ที่ input เดิมหลัง render
-    const activeId = document.activeElement ? document.activeElement.id : null;
     renderChecks();
-    // คืน focus กลับไปที่ input ตัวเลขเดิม แล้วเลื่อน cursor ไปท้ายข้อความ
     setTimeout(()=>{
       const inputs = document.querySelectorAll(`.check-item input[type="number"]`);
-      // หา input ที่ตรงกับ id นี้โดยอ้างจาก oninput attribute
-      const target = Array.from(inputs).find(inp => inp.getAttribute("oninput") === `setV(${id},this.value)`);
-      if(target){ target.focus(); target.setSelectionRange(target.value.length, target.value.length); }
-    },0);
+      const target = Array.from(inputs).find(inp => inp.getAttribute("oninput") === `setVQuiet(${id},this.value)`);
+      if(target){ target.focus(); }
+    }, 10);
   } else {
-    // อัปเดตแค่กล่อง status (ผ่าน/ไม่ผ่าน/รอกรอกค่า) และสีกรอบ โดยไม่ re-render ทั้งลิสต์
     updateNumericStatusUI(id);
   }
   updateProgress();
@@ -737,11 +676,7 @@ function updateProgress(){
   document.getElementById("pLabel").textContent=`ตรวจแล้ว ${done} / ${total} รายการ`;
 }
 
-// ============================================================
-// SUBMIT
-// ============================================================
 function buildFullStageName(){
-  // ถ้ามี subtype ที่มีตัวอักษร (LH/RH) ให้เติม "-" ต่อท้าย ตามที่ระบุไว้
   if(!nav.subtype) return nav.stage;
   return nav.stage + "-" + nav.subtype;
 }
@@ -750,7 +685,7 @@ function submitWorker(){
   const worker=document.getElementById("workerName").value.trim();
   const date=document.getElementById("inputDate").value;
   const shift=document.getElementById("inputShift").value;
-  // ตรวจสอบว่าตรวจครบทุกรายการ
+
   let undoneCount = 0;
   if(isContactTip()){
     undoneCount = getContactTipItems().filter(w=>checkState[w]===null || checkState[w]==="").length;
@@ -779,23 +714,26 @@ function submitWorker(){
     status:"pending"
   };
 
-  // บันทึก localStorage
   const all=JSON.parse(localStorage.getItem("isuzu_submissions")||"[]");
   all.push(entry);
   localStorage.setItem("isuzu_submissions",JSON.stringify(all));
 
-  // ส่งไป Google Sheets
-  try{
-    const encoded = encodeURIComponent(JSON.stringify(entry));
-    const img = new Image();
-    img.src = SHEETS_URL + "?payload=" + encoded;
-  }catch(e){ console.log("Sheets error:", e); }
+  fetch(SHEETS_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(entry)
+  }).then(() => {
+    console.log("Data sent to Sheets");
+  }).catch(e => {
+    console.error("Sheets Error:", e);
+  });
 
-  // แสดง success
   const failC=entry.checks.filter(c=>c.result==="fail").length;
   const totalC=entry.checks.length;
   const isCT = isContactTip();
   const changedC = isCT ? entry.checks.filter(c=>c.result==="pass").length : 0;
+  
   document.getElementById("successInfo").innerHTML=`
     <b>Group:</b> ${nav.group} &nbsp;|&nbsp; <b>ประเภท:</b> ${typeLabel}<br>
     <b>Stage:</b> ${isCT ? nav.stage : fullStage}<br>
@@ -811,7 +749,6 @@ function submitWorker(){
 }
 
 function resetForm(){
-  document.getElementById("workerName").value="";
   document.getElementById("remarkText").value="";
   document.getElementById("successScreen").classList.remove("show");
   document.getElementById("page-form").style.display="none";
@@ -825,7 +762,6 @@ function showToast(msg,type=""){
   setTimeout(()=>t.className="toast",3000);
 }
 
-// START
 updateHeader();
 renderGroups();
 </script>
