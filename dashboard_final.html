@@ -92,7 +92,7 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
 /* STAGE ITEMS */
 .stage-list{display:flex;flex-direction:column;gap:6px;margin-top:6px;}
 .si{border-radius:12px;padding:11px 14px;border:1.5px solid var(--border);background:#FAFAFA;}
-.si.si-pass{background:var(--pass-bg);border-color:var(--pass-border);}
+.si.si-pass{background:var(--pass-bg);border-color:var(--pass-border);cursor:pointer;}
 .si.si-fail{background:var(--fail-bg);border-color:var(--fail-border);}
 .si-header{display:flex;align-items:center;gap:8px;}
 .si-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
@@ -252,9 +252,7 @@ function parseRows(rows){
     try{
       const e=JSON.parse(j);
       if(!e||!e.id) return null;
-      
-      // ดักจับสถานะอนุมัติแทนให้แม่นยำยิ่งขึ้น
-      if(e.proxy_by || row["อนุมัติแทนโดย"]) e.status="approved";
+      if(e.proxy_by && e.status==="pending") e.status="approved";
       if(!e.foreman && row["Foreman"]) e.foreman = String(row["Foreman"]);
       if(!e.status && row["สถานะ"]) e.status = String(row["สถานะ"]);
       return e;
@@ -305,9 +303,7 @@ function renderDashboard(){
   const subs=allSubs.filter(s=>{
     const d=String(s.date||"").split("T")[0];
     const shiftOk=currentShift==="ALL"||s.shift===currentShift;
-    
-    // ดักจับทั้งคู่กรณีส่งสเตตัสภาษาอังกฤษหรือภาษาไทยหลุดมาตอนอนุมัติแทน
-    const isApproved = s.status==="approved" || s.status==="Approved" || s.status==="สถานะ";
+    const isApproved = s.status==="approved" || s.status==="Approved";
     return d===dateVal&&isApproved&&shiftOk;
   });
 
@@ -316,21 +312,29 @@ function renderDashboard(){
   const alerts=[];
 
   Object.keys(STATION_DATA).forEach(group=>{
-    Object.entries(STATION_DATA[group]).forEach(([typeKey,typeData])=>{
+    Object.entries(STATION_DATA[group]).forEach(([typeKey,typeData]) => {
       if(!typeStats[typeKey]) typeStats[typeKey]={total:0,pass:0,fail:0,wait:0};
       const stages=getAllStages(group,typeKey);
+      
       stages.forEach(stage=>{
         totalAll++;typeStats[typeKey].total++;
         const stageSubs=subs.filter(s=>s.stage===stage&&s.group===group&&s.type===typeKey);
-        const anyDone=stageSubs.length>0;
-        const anyFail=stageSubs.some(s=>(s.checks||[]).some(c=>c.result==="fail"));
         
-        if(anyFail){typeStats[typeKey].fail++;failAll++;}
-        else if(anyDone){typeStats[typeKey].pass++;passAll++;}
-        else typeStats[typeKey].wait++;
+        // กรองหาเฉพาะใบงานใบที่อัปเดตล่าสุดของด่านนี้ (กันลอจิกซ้ำกรณีตรวจแก้งานรอบสอง)
+        const sortedSubs = stageSubs.sort((a,b)=>new Date(b.timestamp_worker)-new Date(a.timestamp_worker));
+        const anyDone=sortedSubs.length>0;
+        const anyFail=anyDone && (sortedSubs[0].checks||[]).some(c=>c.result==="fail");
         
         if(anyFail){
-          const sub=stageSubs[0];
+          typeStats[typeKey].fail++;failAll++;
+        } else if(anyDone){
+          typeStats[typeKey].pass++;passAll++;
+        } else {
+          typeStats[typeKey].wait++;
+        }
+        
+        if(anyFail){
+          const sub=sortedSubs[0];
           const failItems=(sub.checks||[]).filter(c=>c.result==="fail").map(c=>{
             let t=c.name;if(c.value)t+=" ["+c.value+"]";return t;
           });
@@ -362,11 +366,11 @@ function renderDashboard(){
     const st=typeStats[typeKey];
     const meta=TYPE_META[typeKey]||{label:typeKey,icon:"📋"};
     const done=st.pass+st.fail;
-    let cls="",badge="",badgeCls="";
-    if(st.fail>0){cls="tc-fail";badge="⚠ พบปัญหา";badgeCls="";}
-    else if(done===st.total&&st.total>0){cls="tc-pass";badge="ผ่าน";badgeCls="";}
-    else if(done>0){cls="tc-warn";badge="ผ่านบางส่วน";badgeCls="";}
-    else{badge="รอตรวจ";badgeCls="";}
+    let cls="",badge="";
+    if(st.fail>0){cls="tc-fail";badge="⚠ พบปัญหา";}
+    else if(done===st.total&&st.total>0){cls="tc-pass";badge="ผ่าน";}
+    else if(done>0){cls="tc-warn";badge="ผ่านบางส่วน";}
+    else{badge="รอตรวจ";}
 
     const card=document.createElement("div");
     card.className="tc "+(cls||"");
@@ -400,13 +404,17 @@ function openModal(typeKey,meta,subs){
     stages.forEach(stage=>{
       totalAll++;
       const stageSubs=subs.filter(s=>s.stage===stage&&s.group===group&&s.type===typeKey);
-      const anyFail=stageSubs.some(s=>(s.checks||[]).some(c=>c.result==="fail"));
-      const anyDone=stageSubs.length>0;
+      
+      // ดึงเวอร์ชันล่าสุดมาคิดคำนวณ เพื่อให้รอบแกล้างค่าลบหลุดสเตตัสเก่า
+      const sortedSubs = stageSubs.sort((a,b)=>new Date(b.timestamp_worker)-new Date(a.timestamp_worker));
+      const anyDone=sortedSubs.length>0;
+      const anyFail=anyDone && (sortedSubs[0].checks||[]).some(c=>c.result==="fail");
+      
       let status="wait";
       if(anyFail){status="fail";gFail++;totalFail++;}
       else if(anyDone){status="pass";gPass++;totalPass++;}
-      const bestSub=stageSubs.sort((a,b)=>new Date(b.timestamp_foreman||0)-new Date(a.timestamp_foreman||0))[0];
-      stageResults.push({stage,status,sub:bestSub});
+      
+      stageResults.push({stage,status,sub:sortedSubs[0]});
     });
 
     const grpEl=document.createElement("div");
@@ -427,25 +435,55 @@ function openModal(typeKey,meta,subs){
       ...stageResults.filter(r=>r.status==="pass"),
       ...stageResults.filter(r=>r.status==="wait"),
     ];
-    sorted.forEach(r=>{
+    
+    sorted.forEach((r, idx)=>{
       const cls=r.status==="pass"?"si-pass":r.status==="fail"?"si-fail":"";
       const dotCls=r.status==="pass"?"dp":r.status==="fail"?"df":"dw";
       const tagCls=r.status==="pass"?"tp":r.status==="fail"?"tf":"tw";
       const tagTxt=r.status==="pass"?"✓ ผ่าน":r.status==="fail"?"⚠ ไม่ผ่าน":"รอตรวจ";
+      
       const si=document.createElement("div");
       si.className="si "+cls;
+      
+      // บังคับสุ่มสไตล์ไอดีรายกล่อง เพื่อรองรับ Logic กดหดขยาย Toggle ดูผลแยกตัว
+      const uniqueId = `si_detail_${group}_${typeKey}_${idx}`;
 
       const checks=r.sub?(r.sub.checks||[]):[];
       let checksHTML="";
-      if(checks.length&&r.status!=="wait"){
-        checksHTML=`<div class="si-checks">`+
-          checks.map(c=>`<div class="ck ${c.result==="fail"?"ck-fail":""}">
-            <span>${c.name}</span>
-            <span class="ck-val">${c.value?c.value+" · ":""}<span style="color:${c.result==="pass"?"var(--pass)":"var(--red)"}">${c.result==="pass"?"O":"✗"}</span></span>
-          </div>`).join("")+
-          (r.sub?`<div class="si-meta">👷 ${r.sub.worker||""} · ✅ ${r.sub.foreman||"-"}</div>`:"")
-          +`</div>`;
+      
+      if(checks.length && r.status!=="wait"){
+        if(r.status==="fail") {
+          // 🛑 กรณีด่านไม่ผ่าน: สั่งให้กางขยายเปิดค้างไว้แต่แรกทันทีเพื่อเช็คประเด็น
+          checksHTML=`
+            <div class="si-checks" id="${uniqueId}" style="display:block;">`+
+              checks.map(c=>`<div class="ck ${c.result==="fail"?"ck-fail":""}">
+                <span>${c.name}</span>
+                <span class="ck-val">${c.value?c.value+" · ":""}<span style="color:${c.result==="pass"?"var(--pass)":"var(--red)"}">${c.result==="pass"?"O":"✗"}</span></span>
+              </div>`).join("")+
+              (r.sub?`<div class="si-meta">👷 ${r.sub.worker||""} · ✅ ${r.sub.foreman||"-"}</div>`:"")
+            +`</div>`;
+        } else {
+          // 🟢 กรณีด่านผ่าน: ซ่อนซับแถวเก็บไว้ก่อน (สไตล์ยืดหดได้เมื่อกดคลิก)
+          checksHTML=`
+            <div class="si-checks" id="${uniqueId}" style="display:none;">`+
+              checks.map(c=>`<div class="ck">
+                <span>${c.name}</span>
+                <span class="ck-val">${c.value?c.value+" · ":""}<span style="color:var(--pass)">O</span></span>
+              </div>`).join("")+
+              (r.sub?`<div class="si-meta">👷 ${r.sub.worker||""} · ✅ ${r.sub.foreman||"-"}</div>`:"")
+            +`</div>`;
+            
+          // แปะฟังชั่นกดคลิกสลับโหมดเปิดกางดูผลเฉพาะฝั่งกล่องผ่านงาน
+          si.onclick = (e) => {
+            e.stopPropagation();
+            const detailBox = document.getElementById(uniqueId);
+            if(detailBox) {
+              detailBox.style.display = (detailBox.style.display === "none") ? "block" : "none";
+            }
+          };
+        }
       }
+      
       si.innerHTML=`
         <div class="si-header">
           <div class="si-dot ${dotCls}"></div>
