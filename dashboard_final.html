@@ -217,6 +217,16 @@ const STATION_DATA={
   },
 };
 
+// ตารางรายชื่อหลักสำหรับดึงชื่อเจ้าของกลุ่มตัวจริงมาแมปบนบอร์ดออฟฟิศอัตโนมัติ
+const MASTER_FOREMAN_MAP = {
+  "FRC_A": "นาย สุพัฒน์ คำชนะ", "FRE_A": "นาย สมพงศ์ พุ่มแก้ว", "FRF_A": "นาย เสมียน ผลจันทร์",
+  "FRL_A": "นาย วิหาญ แรมจันทึก", "FRR_A": "นาย ประกาศ นวนสว่าง", "FRU_A": "นาย ขจร พาลี",
+  "FRX_A": "นาย คเชนทร์ ขาวจันทึก", "FXC_A": "นาย วัฒนา บุรมรัตน์", "FRC_B": "นาย ประสบ เสาหงษ์",
+  "FRE_B": "นาย บันลือ หมวดผา", "FRF_B": "นาย ปัญญา ศรีโพธิ์ชัย", "FRL_B": "นาย สหวั่น ฦาฤทธิ์",
+  "FRR_B": "นาย ธงชัย รุ่งโรจน์", "FRU_B": "นาย วชิระ วงศ์เหล่า", "FRX_B": "นาย ต้นรัก งามกุลประสิทธิ์",
+  "FXC_B": "นาย วิบูลย์ อาจหาญ"
+};
+
 function getAllStages(group,typeKey){
   const t=STATION_DATA[group]&&STATION_DATA[group][typeKey];
   if(!t) return [];
@@ -252,7 +262,7 @@ function parseRows(rows){
     try{
       const e=JSON.parse(j);
       if(!e||!e.id) return null;
-      if(e.proxy_by && e.status==="pending") e.status="approved";
+      if(e.proxy_by || row["อนุมัติแทนโดย"]) e.status="approved";
       if(!e.foreman && row["Foreman"]) e.foreman = String(row["Foreman"]);
       if(!e.status && row["สถานะ"]) e.status = String(row["สถานะ"]);
       return e;
@@ -320,7 +330,6 @@ function renderDashboard(){
         totalAll++;typeStats[typeKey].total++;
         const stageSubs=subs.filter(s=>s.stage===stage&&s.group===group&&s.type===typeKey);
         
-        // กรองหาเฉพาะใบงานใบที่อัปเดตล่าสุดของด่านนี้ (กันลอจิกซ้ำกรณีตรวจแก้งานรอบสอง)
         const sortedSubs = stageSubs.sort((a,b)=>new Date(b.timestamp_worker)-new Date(a.timestamp_worker));
         const anyDone=sortedSubs.length>0;
         const anyFail=anyDone && (sortedSubs[0].checks||[]).some(c=>c.result==="fail");
@@ -405,7 +414,6 @@ function openModal(typeKey,meta,subs){
       totalAll++;
       const stageSubs=subs.filter(s=>s.stage===stage&&s.group===group&&s.type===typeKey);
       
-      // ดึงเวอร์ชันล่าสุดมาคิดคำนวณ เพื่อให้รอบแกล้างค่าลบหลุดสเตตัสเก่า
       const sortedSubs = stageSubs.sort((a,b)=>new Date(b.timestamp_worker)-new Date(a.timestamp_worker));
       const anyDone=sortedSubs.length>0;
       const anyFail=anyDone && (sortedSubs[0].checks||[]).some(c=>c.result==="fail");
@@ -445,35 +453,64 @@ function openModal(typeKey,meta,subs){
       const si=document.createElement("div");
       si.className="si "+cls;
       
-      // บังคับสุ่มสไตล์ไอดีรายกล่อง เพื่อรองรับ Logic กดหดขยาย Toggle ดูผลแยกตัว
       const uniqueId = `si_detail_${group}_${typeKey}_${idx}`;
-
       const checks=r.sub?(r.sub.checks||[]):[];
       let checksHTML="";
       
       if(checks.length && r.status!=="wait"){
+        // ----------------------------------------------------
+        // ส่วนคัดกรองจัดรูปแบบชื่อของหัวหน้างานตัวจริง/คนตรวจแทนเพื่อแสดงบนหน้าต่าง แดชบอร์ด
+        // ----------------------------------------------------
+        let displayFmName = r.sub.foreman || "-";
+        const dbKey = r.sub.group + "_" + r.sub.shift;
+        if (MASTER_FOREMAN_MAP[dbKey]) {
+          displayFmName = MASTER_FOREMAN_MAP[dbKey];
+        }
+        
+        let fmTimeString = "";
+        if (r.sub.timestamp_foreman) {
+          try {
+            const dFm = new Date(r.sub.timestamp_foreman);
+            fmTimeString = " (" + dFm.toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit",second:"2-digit"}) + ")";
+          } catch(err){}
+        }
+
+        let fmDisplayLine = "";
+        if (r.sub.proxy_by) {
+          // เคส: มีการกดอนุมัติทำงานแทนกันข้ามกลุ่ม
+          fmDisplayLine = `✅ ${displayFmName} <span style="color:var(--warn); font-weight:700;">(แทนโดย ${r.sub.proxy_by} (${r.sub.proxy_for_group||""})${fmTimeString})</span>`;
+        } else {
+          // เคส: หัวหน้าประจำกลุ่มอนุมัติงานตามปกติ
+          fmDisplayLine = `✅ ${displayFmName}${fmTimeString}`;
+        }
+
+        let workerTimeString = "";
+        if (r.sub.timestamp_worker) {
+          try {
+            const dWk = new Date(r.sub.timestamp_worker);
+            workerTimeString = " (" + dWk.toLocaleTimeString("th-TH",{hour:"2-digit",minute:"2-digit",second:"2-digit"}) + ")";
+          } catch(err){}
+        }
+
         if(r.status==="fail") {
-          // 🛑 กรณีด่านไม่ผ่าน: สั่งให้กางขยายเปิดค้างไว้แต่แรกทันทีเพื่อเช็คประเด็น
           checksHTML=`
             <div class="si-checks" id="${uniqueId}" style="display:block;">`+
               checks.map(c=>`<div class="ck ${c.result==="fail"?"ck-fail":""}">
                 <span>${c.name}</span>
                 <span class="ck-val">${c.value?c.value+" · ":""}<span style="color:${c.result==="pass"?"var(--pass)":"var(--red)"}">${c.result==="pass"?"O":"✗"}</span></span>
               </div>`).join("")+
-              (r.sub?`<div class="si-meta">👷 ${r.sub.worker||""} · ✅ ${r.sub.foreman||"-"}</div>`:"")
+              `<div class="si-meta">👷 Worker: ${r.sub.worker||""}${workerTimeString}<br>👔 Foreman: ${fmDisplayLine}</div>`
             +`</div>`;
         } else {
-          // 🟢 กรณีด่านผ่าน: ซ่อนซับแถวเก็บไว้ก่อน (สไตล์ยืดหดได้เมื่อกดคลิก)
           checksHTML=`
             <div class="si-checks" id="${uniqueId}" style="display:none;">`+
               checks.map(c=>`<div class="ck">
                 <span>${c.name}</span>
                 <span class="ck-val">${c.value?c.value+" · ":""}<span style="color:var(--pass)">O</span></span>
               </div>`).join("")+
-              (r.sub?`<div class="si-meta">👷 ${r.sub.worker||""} · ✅ ${r.sub.foreman||"-"}</div>`:"")
+              `<div class="si-meta">👷 Worker: ${r.sub.worker||""}${workerTimeString}<br>👔 Foreman: ${fmDisplayLine}</div>`
             +`</div>`;
             
-          // แปะฟังชั่นกดคลิกสลับโหมดเปิดกางดูผลเฉพาะฝั่งกล่องผ่านงาน
           si.onclick = (e) => {
             e.stopPropagation();
             const detailBox = document.getElementById(uniqueId);
@@ -504,6 +541,7 @@ function openModal(typeKey,meta,subs){
 }
 
 function closeModal(){
+  document.getElementById("overlay").classList.remove("remove");
   document.getElementById("overlay").classList.remove("show");
   document.body.style.overflow="";
 }
