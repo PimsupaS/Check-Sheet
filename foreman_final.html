@@ -154,7 +154,6 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--text);min
       </div>
       <div class="tab" id="tab-stations" onclick="switchTab('stations')">📊 Station ของฉัน</div>
       <div class="tab" id="tab-hold" onclick="switchTab('hold')">⏸ รอแก้ไข <span class="badge badge-warn" id="holdBadge" style="display:none">0</span></div>
-      <div class="tab" id="tab-proxy" onclick="openProxyModal()" style="color:#D97706;">🔄 แทน</div>
     </div>
   </div>
 
@@ -553,17 +552,18 @@ function approve(id){
   const idx = all.findIndex(s=>s.id===id);
   if(idx===-1) return;
   
-  all[idx].foreman = name;
-  all[idx].foreman_code = currentFM.code;
-  all[idx].timestamp_foreman = new Date().toISOString();
-  all[idx].status = "approved";
-  
-  // บันทึกข้อมูบให้สะท้อนกลุ่มต้นทางคนกดแทนอย่างถูกต้อง
   if(proxyMode){
+    all[idx].foreman = name.replace(" [แทน]", "").trim(); 
     all[idx].proxy_by = FOREMAN_DB[currentFM.code].name; 
     all[idx].proxy_code = currentFM.code;               
     all[idx].proxy_for_group = originalGroup;           
+  } else {
+    all[idx].foreman = name;
+    all[idx].foreman_code = currentFM.code;
   }
+  
+  all[idx].timestamp_foreman = new Date().toISOString();
+  all[idx].status = "approved";
   saveSubs(all);
 
   const approvedEntry = all[idx];
@@ -694,7 +694,7 @@ function exitProxy(){
   currentFM.shift = originalShift;
 
   const proxyBar = document.getElementById("proxyBar");
-  if(proxyBar) proxyBar.remove("show");
+  if(proxyBar) proxyBar.classList.remove("show");
   document.getElementById("fmName").textContent = currentFM.name;
   
   renderApprove();
@@ -762,7 +762,7 @@ function renderHold(){
     );
 
     const pendingNew = all.find(x=>
-      x.status==="pending" &&
+      x.status==="approved" &&
       x.stage===s.stage && x.group===s.group &&
       x.shift===s.shift &&
       String(x.date||"").split("T")[0]===today &&
